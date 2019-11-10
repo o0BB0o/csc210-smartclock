@@ -28,7 +28,7 @@ def signup():
         db.session.add(user)
         db.session.commit( )
 
-        flash("Successfully signed up!")
+        flash("Successfully signed up, try to login now!")
 
         return redirect(url_for('home'))
 

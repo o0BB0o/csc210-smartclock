@@ -1,5 +1,6 @@
-from smartclock import db, login_manager
+from smartclock import db, login_manager, database_name
 from flask_login import UserMixin
+import os
 
 """
 Learn more here:
@@ -22,3 +23,16 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
+
+
+# custom method to handle the database if it doesn't exist
+def db_not_exists():
+    appdir = os.path.abspath(os.path.dirname(__file__))
+    return not os.path.exists(os.path.join(appdir, database_name))
+
+if db_not_exists():
+    print("it doesn't exist")
+    db.drop_all()
+    db.create_all()
+else:
+    print("it exists")

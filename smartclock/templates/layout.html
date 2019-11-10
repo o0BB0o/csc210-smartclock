@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+    {% if title %}
+        <title>SmartClock - {{ title }}</title>
+    {% else %}
+        <title>SmartClock</title>
+    {% endif %}
+    </head>
+    <body>
+    <header>
+        <div>
+          <h1>Smart Clock</h1>
+
+          <nav>
+              <ul>
+                  <li><a href="{{ url_for('home') }}">Home</a></li>
+
+                {% if current_user.is_authenticated %}
+
+                  <h1>{{ current_user.username}}</h1>
+                  <a href="{{ url_for('profile') }}">My Profile</a>
+                  <a href="{{ url_for('logout') }}">Log out</a>
+
+                {% else %}
+
+                  <li><a href="{{ url_for('login') }}">Log in</a></li>
+                  <li><a href="{{ url_for('signup') }}">Sign up</a></li>
+
+                {% endif %}
+
+              </ul>
+
+          </nav>
+        </div>
+
+    </header>
+    <main>
+
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          {% block content %}
+
+<!--            other pages' codes will be here -->
+
+            {% endblock %}
+
+    </main>
+</body>
+</html>

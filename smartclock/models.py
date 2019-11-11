@@ -1,6 +1,6 @@
 from smartclock import db, login_manager, database_name
 from flask_login import UserMixin
-import os
+import os, sqlite3
 
 """
 Learn more here:
@@ -25,14 +25,27 @@ class User(db.Model, UserMixin):
         return f"User('{self.username}', '{self.email}')"
 
 
-# custom method to handle the database if it doesn't exist
-def db_not_exists():
-    appdir = os.path.abspath(os.path.dirname(__file__))
-    return not os.path.exists(os.path.join(appdir, database_name))
 
-if db_not_exists():
-    print("it doesn't exist")
+# custom method to handle the database if it doesn't exist
+appdir = os.path.abspath(os.path.dirname(__file__))
+database_location = os.path.join(appdir, database_name)
+
+def database_exists():
+    return os.path.exists(database_location)
+
+def checkTableExists(tablename):
+    con = sqlite3.connect(database_location)
+    c = con.cursor()
+    c.execute("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='%s' " % tablename)
+    if c.fetchone()[0] == 1:
+        c.close()
+        # Table exists
+        return True
+
+    c.close()
+    return False
+
+
+if database_exists is False or checkTableExists(User.__tablename__) is False:
     db.drop_all()
     db.create_all()
-else:
-    print("it exists")

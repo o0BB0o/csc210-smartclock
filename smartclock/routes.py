@@ -1,4 +1,4 @@
-from smartclock import app, db, bcrypt, login_manager
+from smartclock import app, db, bcrypt
 from flask import render_template, redirect, url_for, flash, request
 from smartclock.forms import RegistrationForm, LoginForm
 from smartclock.models import User

@@ -2,7 +2,7 @@ from smartclock import app, db
 from flask import render_template, redirect, url_for, flash, request
 from smartclock.forms import RegistrationForm, LoginForm
 from smartclock.models import User
-from smartclock.functions import check_password, hash_password
+from smartclock.functions import check_password, hash_password, permission_required, admin_required, Permission
 from flask_login import login_user, logout_user, login_required, current_user
 
 
@@ -79,5 +79,21 @@ def logout():
 def profile():
     return  render_template('profile.html', title='My Profile')
 
+@app.route("/admin")
+@login_required
+@admin_required
+def for_admins_only():
+    return "Congratulations on Administrator Privileges!"
 
+@app.route("/manager")
+@login_required
+@permission_required(Permission.MANAGER)
+def for_moderators_only():
+    return "Congratulations on MANAGER Privileges!"
+
+@app.route("/users")
+@login_required
+@permission_required(Permission.USER)
+def for_moderators_only():
+    return "Congratulations on USER Privileges!"
 

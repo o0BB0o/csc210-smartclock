@@ -4,6 +4,10 @@ from passlib.hash import argon2
 from sqlite3 import connect
 from smartclock import database_name
 from os import path
+from functools import wraps
+from flask import abort
+from flask_login import current_user
+from smartclock.models import Permission
 
 
 """
@@ -48,3 +52,21 @@ def tableDoesNotExist(tablename):
         return False # Table exists
     c.close()
     return True # Table does not exist
+
+
+"""
+
+    Custom Python Decorators
+
+"""
+
+def permission_required(perm):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not current_user.can(perm):
+                abort(403)
+            return f(*args, **kwargs)
+        return decorated_function
+def admin_required(f):
+    return permission_required(Permission.ADMIN)(f)

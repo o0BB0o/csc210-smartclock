@@ -14,10 +14,9 @@ def home():
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
 
-    # in case, if user is already logged in
+    # in case, if user is already logged in, it will redirect to homepage
     if current_user.is_authenticated:
         return redirect(url_for('home'))
-
 
     form  = RegistrationForm()
 
@@ -32,7 +31,6 @@ def signup():
         flash("Successfully signed up, try to login now!")
 
         return redirect(url_for('home'))
-
 
     return render_template('signup.html', form=form, title='Sign Up')
 

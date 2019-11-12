@@ -79,5 +79,16 @@ def logout():
 def profile():
     return  render_template('profile.html', title='My Profile')
 
+@app.route("/confirm/<string:token>")
+@login_required
+def confirm(token):
+    if current_user.confirmed:
+        pass
+    elif current_user.confirm(token):
+        flash("Your account is now confirmed")
+    else:
+        flash("Your confirmation link is invalid or has expired")
+    return redirect(url_for("index"))
+
 
 

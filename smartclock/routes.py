@@ -1,5 +1,5 @@
 from smartclock import app, db
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, jsonify
 from smartclock.forms import RegistrationForm, LoginForm
 from smartclock.models import User
 from smartclock.functions import check_password, hash_password
@@ -79,5 +79,19 @@ def logout():
 def profile():
     return  render_template('profile.html', title='My Profile')
 
+
+"""
+    Restful API Implementation
+    
+"""
+@app.route("/api/v1/users/")
+def get_users():
+    users = User.query.all()
+    return jsonify({"posts": [user.to_json() for user in users]})
+
+@app.route("/api/v1/post/<int:id>")
+def get_post(uid):
+    user = User.query.get_or_404(uid)
+    return jsonify(user.to_json())
 
 

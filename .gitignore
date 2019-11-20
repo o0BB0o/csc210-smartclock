@@ -1,2 +1,16 @@
 .DS_Store
 .idea
+.atom
+.sublime-workspace
+Thumbs.db
+*.pc
+*.pyc
+*.pyo
+__pycache__/
+__pycache__
+/__pycache__/
+/_build/
+/dist/
+/node_modules/
+/env/
+/venv/

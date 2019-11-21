@@ -10,6 +10,10 @@ from flask_login import login_user, logout_user, login_required, current_user
 def home():
     return render_template('home.html')
 
+@app.route("/about")
+def home():
+    return "Welcome to About Page!"
+
 
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
@@ -74,10 +78,10 @@ def logout():
     return redirect(url_for("home"))
 
 
-@app.route("/profile")
+@app.route("/myaccount")
 @login_required
 def profile():
-    return  render_template('profile.html', title='My Profile')
+    return  render_template('profile.html', title='My Account')
 
 
 

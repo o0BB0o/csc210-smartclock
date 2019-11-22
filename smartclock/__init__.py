@@ -16,7 +16,7 @@ db = SQLAlchemy(app)
 login_manager=LoginManager(app)
 login_manager.login_view = 'login'
 
-Bootstrap(app)
+bootstrap = Bootstrap(app)
 
 """
 By default, when a user attempts to access a login_required view without being logged in,

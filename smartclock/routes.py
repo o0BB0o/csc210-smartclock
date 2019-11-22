@@ -8,15 +8,15 @@ from flask_login import login_user, logout_user, login_required, current_user
 
 @app.route("/")
 def home():
-    return render_template('home.html')
+    return render_template('index.html')
 
 @app.route("/about")
-def home():
-    return "Welcome to About Page!"
+def about():
+    return render_template('about.html')
 
 
-@app.route("/signup", methods=['GET', 'POST'])
-def signup():
+@app.route("/register", methods=['GET', 'POST'])
+def register():
 
     # in case, if user is already logged in, it will redirect to homepage
     if current_user.is_authenticated:
@@ -32,11 +32,11 @@ def signup():
         db.session.add(user)
         db.session.commit( )
 
-        flash("Successfully signed up, try to login now!")
+        flash("You have successfully created an account, login now!", "success")
 
         return redirect(url_for('home'))
 
-    return render_template('signup.html', form=form, title='Sign Up')
+    return render_template('register.html', form=form, title='Register')
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -74,7 +74,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash("You have been logged out")
+    flash("You have been logged out", "info")
     return redirect(url_for("home"))
 
 

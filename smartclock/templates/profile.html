@@ -1,11 +1,10 @@
 {% extends "layout.html" %}
+
 {% block content %}
-
-<!--This page is created as one kind of the hidden page where the login_required is used, so that only logged on users can access this page.-->
-
-<h1>Welcome to your profile page!</h1>
-
-<p>Your current username is {{current_user.username}} and your email is {{current_user.email}} </p>
-<p>Another way to view this information -> {{current_user.__repr__()}} </p>
-
+        <header class="text-center p-5">
+            <h1 class="display-3">Hello, {{current_user.username}}!</h1>
+        </header>
+        <main class="p-5">
+            <p>THIS SITE IS UNDER CONSTRUCTION FOR -> {{current_user.__repr__()}} </p>
+        </main>
 {% endblock content %}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en>
     <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -13,7 +13,7 @@
     </head>
 
     <body>
-        <nav class="navbar navbar-expand-md navbar-dark bg-steel">
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand mr-4" href="{{ url_for('home') }}">Smart Clock</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,24 +38,21 @@
             </div>
         </nav>
 
-        {% from 'bootstrap/utils.html' import render_flashed_messages %}
-        {{ render_messages() }}
-
-<!--        {% with messages = get_flashed_messages(with_categories=true) %}-->
-<!--        {% if messages %}-->
-<!--        {% for category, message in messages %}-->
-<!--        <div class="alert alert-{{ category }}">-->
-<!--            {{ message }}-->
-<!--        </div>-->
-<!--        {% endfor %}-->
-<!--        {% endif %}-->
-<!--        {% endwith %}-->
+         {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
 
         {% block content %}
-        {# basic layout template #}
         {% endblock %}
 
-        <footer class="p-5 text-center">CSC210 Web Programming!</footer>
+        <footer class="p-3 text-center">CSC210 Web Programming</footer>
+
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

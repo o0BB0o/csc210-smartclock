@@ -1,27 +1,68 @@
 {% extends "layout.html" %}
-{% from 'bootstrap/form.html' import render_form %}
+
+{% block more_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+{% endblock %}
 
 {% block content %}
-        <main class="container p-5">
-            <div class="row">
-                <div class="col-5 mx-auto">
-                    <form method="POST">
-                        {{ render_form(form) }}
-                    </form>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-5 mx-auto mt-3">
-                    <a class = "mt-5 pt-5" href="#">Forgot Password?</a>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-5 mx-auto border-top mt-3 lead">
-                    <small>
-                         Need An Account? <a href="{{ url_for('register') }}">Register Now</a>
-                    </small>
-                </div>
-            </div>
-        </main>
-{% endblock content %}
 
+        <main class="content">
+         <div class="container">
+            <div class="row">
+               <div class="col-12 mx-auto">
+                  <div class="card card-signin flex-row my-5">
+                     <div class="card-img-left d-none d-md-flex">
+                        <!-- Background image for card set in CSS! -->
+                     </div>
+                     <div class="card-body">
+                        <h5 class="card-title text-center">Sign In</h5>
+                        <form class="form-signin">
+                           <div class="form-label-group">
+
+                               {{ form.username.label(class="form-control-label") }}
+
+                                {% if form.username.errors %}
+                                    {{ form.username(class="form-control form-control-lg is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.username.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.username(class="form-control form-control-lg") }}
+                                {% endif %}
+                           </div>
+                           <div class="form-label-group">
+
+                               {{ form.password.label(class="form-control-label") }}
+
+                                {% if form.password.errors %}
+                                    {{ form.password(class="form-control form-control-lg is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.password.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.password(class="form-control form-control-lg") }}
+                                {% endif %}
+                           </div>
+                           <div class="form-label-group">
+
+                                {{ form.remember(class="form-check-input ml-2") }}
+                                {{ form.remember.label(class="form-check-label ml-4") }}
+
+                           </div>
+
+                            {{ form.submit(class="btn btn-lg btn-primary btn-block text-uppercase") }}
+                            <a class="d-block text-center mt-3 mb-3" href="{{ url_for('register') }}">Sign Up</a>
+                        </form>
+                         <div class="border-top p-2"> <a href="#">Forgot Password?</a></div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </main>
+
+{% endblock content %}

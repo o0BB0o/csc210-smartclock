@@ -1,10 +1,18 @@
 {% extends "layout.html" %}
 
 {% block content %}
-        <header class="text-center p-5">
-            <h1 class="display-3">Hello, {{current_user.username}}!</h1>
-        </header>
-        <main class="p-5">
-            <p>THIS SITE IS UNDER CONSTRUCTION FOR -> {{current_user.__repr__()}} </p>
+
+        <main class="container text-center">
+            <div class="row">
+                <div class="col-12 p-5">
+                    <h1 class="display-3">Hello, {{current_user.username}}!</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 p-5">
+                    <p>THIS SITE IS UNDER CONSTRUCTION FOR -> {{current_user.__repr__()}} </p>
+                </div>
+            </div>
         </main>
+
 {% endblock content %}

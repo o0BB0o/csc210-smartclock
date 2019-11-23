@@ -47,9 +47,9 @@ def login():
 
         if user and check_password(password=form.password.data, hash_=user.password):
             login_user(user, remember=form.remember.data)
-            flash("Welcome back!", "success")
+            flash("Welcome back!", "info")
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('myaccount'))
+            return redirect(next_page) if next_page else redirect(url_for('calendar'))
 
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
@@ -64,8 +64,23 @@ def logout():
     flash("You have been logged out", "info")
     return redirect(url_for("home"))
 
-
-@app.route("/myaccount")
+@app.route("/calendar")
 @login_required
-def myaccount():
-    return render_template('profile.html', title='My Account')
+def calendar():
+    return render_template('calendar.html', title='Calendar')
+
+@app.route("/clock")
+@login_required
+def clock_in_or_out():
+    return render_template('clock.html', title='Clock In Or Out')
+
+@app.route("/edit-profile")
+@login_required
+def edit_profile():
+    return render_template('edit-profile.html', title='Edit Profile')
+
+
+@app.route("/submit")
+@login_required
+def submit_timesheet():
+    return render_template('submit.html', title='Submit Timesheet')

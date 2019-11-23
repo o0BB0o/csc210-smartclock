@@ -12,12 +12,13 @@ This callback is used to reload the user object from the user ID stored in the s
 It should take the unicode ID of a user, and return the corresponding user object. 
 """
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-class User(db.Model, UserMixin):
 
+class User(db.Model, UserMixin):
     # required
 
     id = db.Column(db.Integer, primary_key=True)
@@ -44,33 +45,22 @@ class User(db.Model, UserMixin):
 
     timesheets = db.relationship("Timesheet", backref="user")
 
-    def __init__(self, username, password, email, timesheets):
-        self.username = username
-        self.password = password
-        self.email = email
-        self.timesheets = timesheets
-
     def __repr__(self):
         return '<User %r>' % self.username
 
-class Timesheet(db.Model):
 
+class Timesheet(db.Model):
     # required
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)
     # date_submitted = db.Column(db.DateTime, nullable=True, default=None)
     clock_in_time = db.Column(db.DateTime, nullable=False)
     clock_out_time = db.Column(db.DateTime, nullable=True)
+
     # is_clocked_in = db.Column(db.Boolean, default=False)
 
-    def __init__(self, date, clock_in_time, clock_out_time):
-        self.date = date
-        self.clock_in_time = clock_in_time
-        self.clock_out_time = clock_out_time
-
-
     user_id = db.Column(db.Integer(),
-                          db.ForeignKey("user.id"))
+                        db.ForeignKey("user.id"))
 
 
 if tableDoesNotExist(User.__tablename__):
@@ -79,10 +69,8 @@ if tableDoesNotExist(User.__tablename__):
 
 # that is how we use it!
 # ts_1 = Timesheet(datetime.utcnow(), datetime.utcnow(), datetime.now())
-# user_1 = User("islomzhan", "tests", "the@database.comm", [ts_1])
+# user_1 = User(username="islomzhan", password="tests", email="the@database.comm", timesheets=[ts_1])
 #
 # db.session.add_all([ts_1])
 # db.session.add(user_1)
 # db.session.commit()
-
-

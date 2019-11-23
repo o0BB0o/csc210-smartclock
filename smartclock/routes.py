@@ -10,6 +10,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 def home():
     return render_template('index.html')
 
+
 @app.route("/about")
 def about():
     return render_template('about.html')
@@ -17,58 +18,44 @@ def about():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-
     # in case, if user is already logged in, it will redirect to homepage
     if current_user.is_authenticated:
         return redirect(url_for('home'))
 
-    form  = RegistrationForm()
+    form = RegistrationForm()
 
-    if(form.validate_on_submit()):
-
-        hashed_password = hash_password(password = form.password.data)
-        user = User(username = form.username.data, password = hashed_password, email = form.email.data)
+    if form.validate_on_submit():
+        hashed_password = hash_password(password=form.password.data)
+        user = User(username=form.username.data, password=hashed_password, email=form.email.data)
 
         db.session.add(user)
-        db.session.commit( )
+        db.session.commit()
 
-        flash("You have successfully created an account, login now!", "success")
+        flash("You have successfully created your account, login now!", "success")
 
         return redirect(url_for('home'))
 
     return render_template('register.html', form=form, title='Register')
 
+
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-
     form = LoginForm()
 
-    if(form.validate_on_submit()):
+    if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
 
-        if user and check_password(password = form.password.data, hash_ = user.password):
-
+        if user and check_password(password=form.password.data, hash_=user.password):
             login_user(user, remember=form.remember.data)
-
-            flash("Welcome back!")
-
-            # for the anonymous users who try to reach login_required pages will firstly lead them to this login page,
-            # remembers that login_required page and redirects them back after they've logged in
-            # else they go to home page
-
+            flash("Welcome back!", "success")
             next_page = request.args.get('next')
-
-            if next_page:
-                return redirect(next_page)
-            else:
-                return redirect(url_for('home'))
+            return redirect(next_page) if next_page else redirect(url_for('home'))
 
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
 
+    return render_template('login.html', form=form, title='Log in')
 
-
-    return render_template('login.html', form = form, title='Log in')
 
 @app.route("/logout")
 @login_required
@@ -81,7 +68,4 @@ def logout():
 @app.route("/myaccount")
 @login_required
 def profile():
-    return  render_template('profile.html', title='My Account')
-
-
-
+    return render_template('profile.html', title='My Account')

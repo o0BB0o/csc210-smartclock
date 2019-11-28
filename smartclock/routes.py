@@ -7,13 +7,14 @@ from flask_login import login_user, logout_user, login_required, current_user
 
 
 @app.route("/")
+@app.route("/home")
 def home():
-    return render_template('index.html')
+    return render_template('public/home.html')
 
 
 @app.route("/about")
 def about():
-    return render_template('about.html')
+    return render_template('public/about.html')
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -35,7 +36,7 @@ def register():
 
         return redirect(url_for('home'))
 
-    return render_template('register.html', form=form, title='Register')
+    return render_template('public/register.html', form=form, title='Register')
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -49,12 +50,12 @@ def login():
             login_user(user, remember=form.remember.data)
             flash("Welcome back!", "info")
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('calendar'))
+            return redirect(next_page) if next_page else redirect(url_for('dashboard'))
 
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
 
-    return render_template('login.html', form=form, title='Log in')
+    return render_template('public/login.html', form=form, title='Log in')
 
 
 @app.route("/logout")
@@ -64,23 +65,17 @@ def logout():
     flash("You have been logged out", "info")
     return redirect(url_for("home"))
 
-@app.route("/calendar")
+@app.route("/dashboard")
 @login_required
-def calendar():
-    return render_template('calendar.html', title='Calendar')
+def dashboard():
+    return render_template('auth/dashboard.html', title='Dashboard')
 
-@app.route("/clock")
+@app.route("/settings")
 @login_required
-def clock_in_or_out():
-    return render_template('clock.html', title='Clock In Or Out')
+def settings():
+    return render_template('auth/settings.html', title='Settings')
 
-@app.route("/edit-profile")
+@app.route("/view")
 @login_required
-def edit_profile():
-    return render_template('edit-profile.html', title='Edit Profile')
-
-
-@app.route("/submit")
-@login_required
-def submit_timesheet():
-    return render_template('submit.html', title='Submit Timesheet')
+def view():
+    return render_template('auth/view.html', title='View Timesheets')

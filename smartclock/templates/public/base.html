@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+   <!-- Required meta tags -->
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   {% if title %}
+   <title>SmartClock - {{ title }}</title>
+   {% else %}
+   <title>Welcome to SmartClock</title>
+   {% endif %}
+   <!-- Bootstrap CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='lib/bootstrap/css/bootstrap.min.css') }}">
+   <!-- Optional CSS -->
+   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='public/css/base.css') }}">
+   <!-- Child's CSS -->
+   {% block more_css %}
+   {% endblock %}
+   </head>
+   <body>
+      <header>
+         <nav class="navbar navbar-expand-md navbar-dark bg-cool">
+            <div class="container">
+               <a class="navbar-brand mr-4" href="{{ url_for('home') }}">Smart Clock</a>
+               <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+               <span class="navbar-toggler-icon"></span>
+               </button>
+               <div class="collapse navbar-collapse" id="navbarToggle">
+                  <div class="navbar-nav mr-auto">
+                     <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
+                     <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
+                  </div>
+                  {% if current_user.is_authenticated %}
+                  {% extends "auth/base-auth.html" %}
+                  <div class="nav navbar-nav ml-auto">
+                     <a class="nav-item nav-link" href="{{ url_for('dashboard') }}"><span class="glyphicon glyphicon-home"></span>{{current_user.username}}</a>
+                     <a class="nav-item nav-link" href="{{ url_for('logout') }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
+                  </div>
+                  {% else %}
+                  <div class="nav navbar-nav ml-auto">
+                     <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
+                     <a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>
+                  </div>
+                  {% endif %}
+                  </div>
+               </div>
+            </div>
+         </nav>
+      </header>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+         {{ message }}
+      </div>
+      {% endfor %}
+      {% endif %}
+      {% endwith %}
+      {% block content %}
+      {% endblock %}
+      <footer class="p-3 text-center">CSC210 Web Programming</footer>
+      <!-- Optional JavaScript -->
+  <!-- jQuery.js -->
+      <script  type="text/javascript" src="{{ url_for('static', filename='lib/jquery/jquery-3.4.1.min.js') }}"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+      <script type="text/javascript" src="{{ url_for('static', filename='lib/bootstrap/js/bootstrap.min.js') }}" ></script>
+      {% block more_js %}
+      {% endblock %}
+   </body>
+</html>

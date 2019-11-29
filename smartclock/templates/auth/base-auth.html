@@ -31,15 +31,18 @@
                <h3>Smart Clock</h3>
             </div>
             <div class="list-group list-group-flush">
-               <h1 class="p-3">Welcome, {{ current_user.username.capitalize() }}!</h1>
+               <div class="p-1">
+<!--                  <i></i>-->
+                  <h1 class="p-3">Welcome, {{ current_user.username.capitalize() }}!</h1>
+               </div>
                <a class="list-group-item list-group-item-action active" href="{{ url_for('dashboard') }}">
-                  <span class="glyphicon glyphicon-list-alt"></span><span class="nav-label">Dashboard</span>
+                  <i class="fas fa-list-alt"></i> Dashboard
                </a>
                <a class="list-group-item list-group-item-action bg-transparent text-white" href="{{ url_for('view') }}">
-                  <span class="glyphicon glyphicon-send"></span><span class="nav-label">View Timesheets</span>
+                  <i class="fas fa-business-time"></i> View Timesheets
                </a>
                <a class="list-group-item list-group-item-action bg-transparent text-white" href="{{ url_for('settings') }}">
-                  <span class="glyphicon glyphicon-cog"></span><span class="nav-label">Settings</span>
+                  <i class="fas fa-cog"></i> Settings
                </a>
             </div>
             <div class="list-unstyled m-4">
@@ -60,8 +63,8 @@
                   <div class="collapse navbar-collapse" id="navbarSupportedContent">
                      <!-- Navbar Right Side -->
                      <div class="nav navbar-nav ml-auto">
-                        <a class="nav-item nav-link" href="{{ url_for('dashboard') }}"><span class="glyphicon glyphicon-home"></span>{{current_user.username}}</a>
-                        <a class="nav-item nav-link" href="{{ url_for('logout') }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
+                        <a class="nav-item nav-link" href="{{ url_for('dashboard') }}"><i class="fas fa-user-circle"></i> {{current_user.username.capitalize()}}</a>
+                        <a class="nav-item nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
                      </div>
                   </div>
                </div>

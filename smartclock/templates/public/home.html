@@ -1,15 +1,16 @@
 {% extends "public/base.html" %}
 
+{% block more_css %}
+   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='public/css/home.css') }}">
+{% endblock %}
+
 {% block content %}
-<main class="container text-center">
-   <div class="row">
-      <div class="col-12 p-5">
-         <h1 class="font-weight-light">Welcome to home page!</h1>
-      </div>
-   </div>
-   <div class="row">
-      <div class="col-12 p-5">
-         <p class="display-4">THIS PAGE IS UNDER CONSTRUCTION!</p>
+<main>
+   <div class="container text-center">
+      <div class="row">
+         <div class="col-12 p-5">
+            <h1 class="font-weight-light">Welcome to home page!</h1>
+         </div>
       </div>
    </div>
 </main>

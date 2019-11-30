@@ -95,7 +95,7 @@ a:focus {
 }
 
 #sidebar a:hover {
-    color: #0059B3 !important;
+    color: #7F8E9E;
     background: #fff !important;
 }
 
@@ -116,7 +116,7 @@ a[data-toggle="collapse"] {
 ----------------------------------------------------- */
 
 #content {
-    width: calc(100% - 250px);
+    width: calc(100% - 300px);
     padding: 0 40px;
     padding-bottom: 40px;
     min-height: 100vh;
@@ -136,7 +136,7 @@ a[data-toggle="collapse"] {
 
 @media (max-width: 768px) {
     #sidebar {
-        margin-left: -250px;
+        margin-left: -300px;
     }
     #sidebar.active {
         margin-left: 0;
@@ -145,7 +145,7 @@ a[data-toggle="collapse"] {
         width: 100%;
     }
     #content.active {
-        width: calc(100% - 250px);
+        width: calc(100% - 300px);
     }
     #sidebarCollapse span {
         display: none;

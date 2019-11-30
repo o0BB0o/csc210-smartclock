@@ -1,8 +1,4 @@
-{% if current_user.is_authenticated %}
-{% extends "auth/base-auth.html" %}
-{% else %}
 {% extends "public/base.html" %}
-{% endif %}
 
 {% block content %}
 <main class="container text-center">

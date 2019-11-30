@@ -69,6 +69,17 @@ def logout():
 def calendar():
     return render_template('calendar.html', title='Calendar')
 
+@app.route("/confirm/<string:token>") # EMAIL AUTHENTICATION
+@login_required
+def confirm(token):
+    if current_user.confirmed:
+        pass
+    elif current_user.confirm(token):
+        flash("Your account is now confirmed")
+    else:
+        flash("Your confirmation link is invalid or has expired")
+    return redirect(url_for("index"))
+
 @app.route("/clock")
 @login_required
 def clock_in_or_out():

@@ -25,16 +25,15 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.Text, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    first_name = db.Column(db.String(120), nullable=False)
+    last_name = db.Column(db.String(120), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now)
 
-    is_supervisor = db.Column(db.Boolean, default=False)
-    hourly_rate = db.Column(db.Float, default=12.75)
-
-    # optional
-    #
-    # first_name = db.Column(db.String(120), nullable=True)
-    # last_name = db.Column(db.String(120), nullable=True)
-    # phone_number = db.Column(db.String(120), nullable=True)
-    # created_at = db.Column(db.DateTime, default=datetime.now)
+    # admin's privileges
+    approved_on = db.Column(db.DateTime, nullable=True)
+    is_approved = db.Column(db.Boolean, default=False, nullable=False)
+    is_supervisor = db.Column(db.Boolean, default=False, nullable=False)
+    hourly_rate = db.Column(db.Float, default=12.75, nullable=True)
 
     # beyond
     #

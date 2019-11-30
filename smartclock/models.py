@@ -28,6 +28,7 @@ class User(db.Model, UserMixin):
     first_name = db.Column(db.String(120), nullable=False)
     last_name = db.Column(db.String(120), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)
+    #image_profile = db.Column()
 
     # admin's privileges
     approved_on = db.Column(db.DateTime, nullable=True)

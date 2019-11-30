@@ -90,14 +90,3 @@ def settings():
 @login_required
 def view():
     return render_template('auth/view.html', title='View Timesheets')
-
-@app.route("/confirm/<string:token>") # EMAIL AUTHENTICATION
-@login_required
-def confirm(token):
-    if current_user.confirmed:
-        pass
-    elif current_user.confirm(token):
-        flash("Your account is now confirmed")
-    else:
-        flash("Your confirmation link is invalid or has expired")
-    return redirect(url_for("index"))

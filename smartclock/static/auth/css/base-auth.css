@@ -48,25 +48,39 @@ a:focus {
 }
 
 #sidebar {
-    width: 280px;
+    width: 300px;
     position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
     z-index: 999;
-    background: #0059B3;
-    color: #fff;
+    background: #F1F1F1;
+    color: #1C2B36;
     transition: all 0.3s;
+}
+#sidebar h1 {
+    color: #1C2B36;
 }
 
 #sidebar.active {
-    margin-left: -280px;
+    margin-left: -300px;
 }
 
 #sidebar .sidebar-header {
     padding: 20px;
-    background: #053669;
+    /*background: #053669;*/
     text-align: center;
+}
+#sidebar .list-group,  .list-group-item {
+    background: #F1F1F1;
+}
+#sidebar .list-group div p {
+    color: #C1C3C9;
+}
+
+.is-current {
+    background: #7F8E9E;
+    color: #f1f1f1;
 }
 
 #sidebar div p {

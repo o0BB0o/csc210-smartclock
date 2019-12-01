@@ -7,91 +7,87 @@ from flask_login import login_user, logout_user, login_required, current_user
 
 
 @app.route("/")
+@app.route("/home")
 def home():
-    return render_template('home.html')
+    return render_template('public/home.html')
 
 
-@app.route("/signup", methods=['GET', 'POST'])
-def signup():
+@app.route("/about")
+def about():
+    return render_template('public/about.html')
 
+
+@app.route("/register", methods=['GET', 'POST'])
+def register():
     # in case, if user is already logged in, it will redirect to homepage
     if current_user.is_authenticated:
         return redirect(url_for('home'))
 
-    form  = RegistrationForm()
+    form = RegistrationForm()
 
-    if(form.validate_on_submit()):
-
-        hashed_password = hash_password(password = form.password.data)
-        user = User(username = form.username.data, password = hashed_password, email = form.email.data)
+    if form.validate_on_submit():
+        hashed_password = hash_password(password=form.password.data)
+        user = User(username=form.username.data, password=hashed_password, email=form.email.data,
+                    last_name=form.lname.data, first_name=form.fname.data)
 
         db.session.add(user)
-        db.session.commit( )
+        db.session.commit()
 
-        flash("Successfully signed up, try to login now!")
+        flash("You have successfully created your account, login now!", "success")
 
         return redirect(url_for('home'))
 
-    return render_template('signup.html', form=form, title='Sign Up')
+    return render_template('public/register.html', form=form, title='Register')
+
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-
     form = LoginForm()
 
-    if(form.validate_on_submit()):
+    if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
 
-        if user and check_password(password = form.password.data, hash_ = user.password):
-
+        if user and check_password(password=form.password.data, hash_=user.password):
             login_user(user, remember=form.remember.data)
-
-            flash("Welcome back!")
-
-            # for the anonymous users who try to reach login_required pages will firstly lead them to this login page,
-            # remembers that login_required page and redirects them back after they've logged in
-            # else they go to home page
-
+            flash("Welcome back!", "info")
             next_page = request.args.get('next')
-
-            if next_page:
-                return redirect(next_page)
-            else:
-                return redirect(url_for('home'))
+            return redirect(next_page) if next_page else redirect(url_for('dashboard'))
 
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
 
+    return render_template('public/login.html', form=form, title='Log in')
 
-
-    return render_template('login.html', form = form, title='Log in')
 
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
-    flash("You have been logged out")
+    flash("You have been logged out", "info")
     return redirect(url_for("home"))
 
-
-@app.route("/profile")
+@app.route("/dashboard")
 @login_required
-def profile():
-    return  render_template('profile.html', title='My Profile')
+def dashboard():
+    return render_template('auth/dashboard.html', title='Dashboard')
 
+@app.route("/confirm/<string:token>") # EMAIL AUTHENTICATION
+@login_required
+def confirm(token):
+    if current_user.confirmed:
+        pass
+    elif current_user.confirm(token):
+        flash("Your account is now confirmed")
+    else:
+        flash("Your confirmation link is invalid or has expired")
+    return redirect(url_for("index"))
 
-"""
-    Restful API Implementation
-    
-"""
-@app.route("/api/v1/users/")
-def get_users():
-    users = User.query.all()
-    return jsonify({"posts": [user.to_json() for user in users]})
+@app.route("/settings")
+@login_required
+def settings():
+    return render_template('auth/settings.html', title='Settings')
 
-@app.route("/api/v1/post/<int:id>")
-def get_post(uid):
-    user = User.query.get_or_404(uid)
-    return jsonify(user.to_json())
-
-
+@app.route("/view")
+@login_required
+def view():
+    return render_template('auth/view.html', title='View Timesheets')

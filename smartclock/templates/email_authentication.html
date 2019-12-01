@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        To {{user.username}},
+            To confirm your account, please click on the link below:
+            {{ url_for("confirm", token=token, _external=True) }}
+        Thank You,
+            Team 210
+</body>
+</html>

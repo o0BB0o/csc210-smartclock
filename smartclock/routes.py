@@ -69,7 +69,11 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template('auth/dashboard.html', title='Dashboard')
+    if current_user.is_admin:
+        users = User.query.filter_by(is_admin = False).all()
+        return render_template('auth/admin/admin-dash.html', title='Dashboard',  users = users)
+    else:
+        return render_template('auth/dashboard.html', title='Dashboard')
 
 @app.route("/confirm/<string:token>") # EMAIL AUTHENTICATION
 @login_required

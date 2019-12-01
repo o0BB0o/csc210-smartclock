@@ -19,8 +19,6 @@ def load_user(user_id):
 
 
 class User(db.Model, UserMixin):
-    # required
-
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.Text, nullable=False)
@@ -29,19 +27,21 @@ class User(db.Model, UserMixin):
     last_name = db.Column(db.String(120), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)
 
+    num_of_days_missing =  db.Column(db.Integer, default=0, nullable=False)
+    num_of_days_left_early =  db.Column(db.Integer, default=0, nullable=False)
+    num_of_days_coming_late =  db.Column(db.Integer, default=0, nullable=False)
+
     # admin's privileges
-    approved_on = db.Column(db.DateTime, nullable=True)
+    approved_on = db.Column(db.DateTime)
     is_approved = db.Column(db.Boolean, default=False, nullable=False)
-    is_supervisor = db.Column(db.Boolean, default=False, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
     hourly_rate = db.Column(db.Float, default=12.75, nullable=True)
 
     # beyond
-    #
     # email_auth_token = db.Column(db.Text, nullable=True)
     # is_authenticated = db.Column(db.Boolean, default=False)
 
     # relationships
-
     timesheets = db.relationship("Timesheet", backref="user")
 
     def __repr__(self):

@@ -21,19 +21,19 @@ def load_user(user_id):
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.Text, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    first_name = db.Column(db.String(120), nullable=False)
-    last_name = db.Column(db.String(120), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    username = db.Column(db.String(120), unique=True)
+    password = db.Column(db.Text)
+    email = db.Column(db.String(120), unique=True)
+    first_name = db.Column(db.String(120))
+    last_name = db.Column(db.String(120))
+    created_at = db.Column(db.DateTime, default=datetime.now.strftime("%Y-%m-%d %H:%M:%S"))
 
-    num_of_days_missing =  db.Column(db.Integer, default=0, nullable=False)
-    num_of_days_left_early =  db.Column(db.Integer, default=0, nullable=False)
-    num_of_days_coming_late =  db.Column(db.Integer, default=0, nullable=False)
+    num_of_days_missing =  db.Column(db.Integer, default=0)
+    num_of_days_left_early =  db.Column(db.Integer, default=0)
+    num_of_days_coming_late =  db.Column(db.Integer, default=0)
 
     # admin's privileges
-    approved_on = db.Column(db.DateTime)
+    approved_on = db.Column(db.DateTime, nullable=True)
     is_approved = db.Column(db.Boolean, default=False, nullable=False)
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
     hourly_rate = db.Column(db.Float, default=12.75, nullable=True)
@@ -51,7 +51,7 @@ class User(db.Model, UserMixin):
 class UserSchema(ma.Schema):
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_approved', 'created_at', 'num_of_days_missing', 'num_of_days_left_early', 'num_of_days_coming_late', 'is_admin', 'hourly_rate')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_approved', 'created_at', 'num_of_days_missing', 'num_of_days_left_early', 'num_of_days_coming_late', 'approved_on', 'is_admin', 'hourly_rate')
 
 user_schema = UserSchema(strict=True)
 users_schema = UserSchema(many=True, strict=True)
@@ -61,9 +61,10 @@ class Timesheet(db.Model):
     # required
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)
+    todays_date = db.Column(db.DateTime, default=datetime.now(), nullable=False)
     clock_in_time = db.Column(db.DateTime, nullable=False)
     clock_out_time = db.Column(db.DateTime, nullable=True)
-    is_clocked_in = db.Column(db.Boolean, default=False, nullable=False)
+    is_clocked_in = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer(),
                         db.ForeignKey("user.id"))
 

@@ -5,6 +5,7 @@ from smartclock.models import User, Timesheet, user_schema, users_schema, timesh
 from smartclock.functions import check_password, hash_password
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
+from sqlalchemy import and_
 
 
 
@@ -103,6 +104,10 @@ def view():
 """
     REST API Implementation
 """
+
+"""
+    --> GET methods | REST API 
+"""
 # get all users
 @app.route('/api/v1/users', methods=['GET'])
 def get_users():
@@ -134,16 +139,157 @@ def get_timesheet(id):
         return jsonify({'message':'timesheet does not exist'})
     return timesheet_schema.jsonify(timesheet)
 
-
-# post a timesheet by its id
-@app.route('/api/v1/timesheets/', methods=['POST'])
-def post_timesheet():
-    date = datetime.utcnow()
-    clock_in_time = datetime.utcnow()
-    clock_out_time = datetime.now()
+"""
+    --> CREATE methods | REST API 
+"""
+# create a timesheet
+@app.route('/api/v1/timesheet', methods=['POST'])
+def create_timesheet():
+    date = request.json['date']
+    todays_date = datetime.now().date()
+    clock_in_time = request.json['clock_in_time']
+    clock_out_time = request.json['clock_out_time']
     is_clocked_in = request.json['is_clocked_in']
     user_id = request.json['user_id']
-    timesheet = Timesheet(date = date, clock_in_time=clock_in_time, clock_out_time=clock_out_time, is_clocked_in=is_clocked_in, user_id=user_id)
-    db.session.add(timesheet)
+    new_timesheet = Timesheet(date=date, todays_date=todays_date, clock_in_time=clock_in_time, clock_out_time=clock_out_time, is_clocked_in=is_clocked_in, user_id=user_id)
+    db.session.add(new_timesheet)
     db.session.commit()
-    return timesheet_schema.jsonify(timesheet)
+    return timesheet_schema.jsonify(new_timesheet)
+
+# create a user
+@app.route('/api/v1/user', methods=['POST'])
+def create_user():
+    # fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_approved',
+    #               'created_at', 'num_of_days_missing', 'num_of_days_left_early',
+    #               'num_of_days_coming_late', 'is_admin', 'hourly_rate')
+
+    username = request.json['username']
+    password = request.json['password']
+    hashed_password = hash_password(password)
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    email = request.json['email']
+
+    new_user = User(username=username, first_name=first_name, last_name=last_name, email=email, password=hashed_password)
+    db.session.add(new_user)
+    db.session.commit()
+    return timesheet_schema.jsonify(new_user)
+
+
+"""
+    --> PATCH methods | REST API 
+    
+    Why not put because for now we don't need it since, with patch we can change what we want, without affecting 
+    the rest of the fields in our Model, because for put we need to list all fields that are actually in Model, and 
+    we should redefine some of them, if we want to keep them.
+"""
+
+
+# patch a user to clock in
+@app.route('/api/v1/users/<username>/in', methods=['PATCH'])
+def clock_in_user(username):
+
+    user = User.query.filter_by(username=username).first()
+
+    if user is not None and user.is_approved and not user.is_admin:
+        todays_date = datetime.now().date()
+        wanted_row = Timesheet.query.filter_by(and_(user_id = user.id, todays_date = todays_date)).first()
+
+        if todays_date == wanted_row.todays_date:
+            if wanted_row.is_clocked_in:
+                return user_schema.jsonify(user)
+            else:
+                wanted_row.is_clocked_in = True
+                wanted_row.todays_date = datetime.now().date()
+                wanted_row.clock_in_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                db.session.commit()
+                return user_schema.jsonify(user)
+        else:
+            # that means that the user is on a new day to work
+            # now we will create a new timesheet row which will let to clock in and stamp its time
+            # then we will add it to the db session
+            new_time_row = Timesheet(is_clocked_in=True, todays_date = datetime.now().date(), clock_in_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"), user_id = user.id)
+            db.session.add(new_time_row)
+            db.session.commit()
+            return user_schema.jsonify(user)
+
+    if user is None:
+        return jsonify({'message':'does not exist'})
+    if not user.is_approved:
+        return jsonify({'message':'user is not yet approved'})
+    if user.is_admin:
+        return jsonify({'message':'user is admin'})
+
+    return jsonify({'message':'some_other_errors'})
+
+# patch a user to clock out
+@app.route('/api/v1/users/<username>/out', methods=['PATCH'])
+def clock_out_user(username):
+
+    user = User.query.filter_by(username=username).first()
+
+    if user is not None and user.is_approved and not user.is_admin:
+        todays_date = datetime.now().date()
+        wanted_row = Timesheet.query.filter_by(and_(user_id = user.id, todays_date = todays_date)).first()
+
+        if todays_date == wanted_row.todays_date:
+            if wanted_row.is_clocked_in:
+                wanted_row.is_clocked_in = False
+                wanted_row.clock_out_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                db.session.commit()
+                return user_schema.jsonify(user)
+            else:
+                return jsonify({'message':'it is already clocked out'})
+
+    if user is None:
+        return jsonify({'message':'does not exist'})
+    if not user.is_approved:
+        return jsonify({'message':'user is not yet approved'})
+    if user.is_admin:
+        return jsonify({'message':'user is admin'})
+
+    return jsonify({'message':'some_other_errors'})
+
+
+"""
+    --> DELETE methods | REST API 
+
+    Why not put because for now we don't need it since, with patch we can change what we want, without affecting 
+    the rest of the fields in our Model, because for put we need to list all fields that are actually in Model, and 
+    we should redefine some of them, if we want to keep them.
+"""
+
+# delete a user by id
+@app.route('/api/v1/users/<int:id>', methods=['DELETE'])
+def delete_user(id):
+
+
+    user_to_be_deleted = User.query.filter_by(id=id).first()
+    get_all_related_timesheets_to_delete = Timesheet.query.filter_by(user_id=user_to_be_deleted.id).all()
+    if not user_to_be_deleted:
+        return jsonify({'message':'user does not exist'})
+    print(get_all_related_timesheets_to_delete)
+
+    if len(get_all_related_timesheets_to_delete) > 0:
+        db.session.delete(get_all_related_timesheets_to_delete)
+    db.session.delete(user_to_be_deleted)
+    db.session.commit()
+    return user_schema.jsonify(user_to_be_deleted)
+
+# delete a user by id
+@app.route('/api/v1/timesheets/<int:id>', methods=['DELETE'])
+def delete_timesheet(id):
+
+    timesheet_to_be_deleted = User.query.filter_by(id=id).first()
+    if not timesheet_to_be_deleted:
+        return jsonify({'message':'timesheet does not exist'})
+    db.session.delete(timesheet_to_be_deleted)
+    db.session.commit()
+    return timesheet_schema.jsonify(timesheet_to_be_deleted)
+
+
+
+
+
+
+

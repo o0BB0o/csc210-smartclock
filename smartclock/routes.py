@@ -169,8 +169,17 @@ def create_user():
     first_name = request.json['first_name']
     last_name = request.json['last_name']
     email = request.json['email']
+    is_approved = request.json['is_approved']
+    is_admin = request.json['is_admin']
+    num_of_days_missing = request.json['num_of_days_missing']
+    num_of_days_left_early = request.json['num_of_days_left_early']
+    num_of_days_coming_late = request.json['num_of_days_coming_late']
+    hourly_rate = request.json['hourly_rate']
+    date = request.json['created_at']
+    created_at = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
 
-    new_user = User(username=username, first_name=first_name, last_name=last_name, email=email, password=hashed_password)
+
+    new_user = User(username=username, created_at=created_at, hourly_rate=hourly_rate, num_of_days_coming_late=num_of_days_coming_late, num_of_days_left_early=num_of_days_left_early, num_of_days_missing=num_of_days_missing, first_name=first_name, last_name=last_name, email=email, is_admin=is_admin, is_approved=is_approved, password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
     return timesheet_schema.jsonify(new_user)

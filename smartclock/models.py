@@ -26,7 +26,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True)
     first_name = db.Column(db.String(120))
     last_name = db.Column(db.String(120))
-    created_at = db.Column(db.DateTime, default=datetime.now.strftime("%Y-%m-%d %H:%M:%S"))
+    created_at = db.Column(db.DateTime, default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     num_of_days_missing =  db.Column(db.Integer, default=0)
     num_of_days_left_early =  db.Column(db.Integer, default=0)
@@ -51,7 +51,7 @@ class User(db.Model, UserMixin):
 class UserSchema(ma.Schema):
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_approved', 'created_at', 'num_of_days_missing', 'num_of_days_left_early', 'num_of_days_coming_late', 'approved_on', 'is_admin', 'hourly_rate')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_approved', 'created_at', 'num_of_days_missing', 'num_of_days_left_early', 'num_of_days_coming_late', 'is_admin', 'hourly_rate')
 
 user_schema = UserSchema(strict=True)
 users_schema = UserSchema(many=True, strict=True)

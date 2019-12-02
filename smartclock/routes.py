@@ -73,8 +73,7 @@ def logout():
 @login_required
 def dashboard():
     if current_user.is_admin:
-        users = User.query.filter_by(is_admin = False).all()
-        return render_template('auth/admin/admin-dash.html', title='Dashboard',  users = users)
+        return render_template('auth/admin/admin-dash.html', title='Dashboard')
     else:
         return render_template('auth/dashboard.html', title='Dashboard')
 
@@ -262,7 +261,6 @@ def clock_out_user(username):
 
 """
     --> DELETE methods | REST API 
-
     Why not put because for now we don't need it since, with patch we can change what we want, without affecting 
     the rest of the fields in our Model, because for put we need to list all fields that are actually in Model, and 
     we should redefine some of them, if we want to keep them.

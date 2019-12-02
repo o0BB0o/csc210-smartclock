@@ -19,10 +19,8 @@
           <div class="row">
               <div class="col-12">
                   <h5 class="border-bottom text-secondary"> Manage Users Here! </h5>
-                  <div class="list-group">
-                      {% for user in users %}
-                      <p class="list-group-item">{{user.username}} | {{user.first_name}} | {{user.last_name}} | Approved = {{user.is_approved}}</p>
-                      {% endfor %}
+                  <div id="ajax_get_users_all" class="list-group">
+                      <p id="ajax_get_a_user" class="list-group-item">Loading Users!</p>
                   </div>
               </div>
           </div>
@@ -30,5 +28,5 @@
 {% endblock %}
 {% block more_js %}
         <script type="text/javascript" src="{{ url_for('static', filename='lib/moment/moment-min.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='auth/js/dashboard.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='auth/js/admin-dash.js') }}"></script>
 {% endblock %}

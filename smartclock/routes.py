@@ -11,6 +11,9 @@ from flask_login import login_user, logout_user, login_required, current_user
 def home():
     return render_template('public/home.html')
 
+@app.route("/email_auth")
+def email_auth():
+     return render_template('auth/email_auth.html')
 
 @app.route("/about")
 def about():

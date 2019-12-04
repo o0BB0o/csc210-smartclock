@@ -77,16 +77,34 @@ def dashboard():
     else:
         return render_template('auth/dashboard.html', title='Dashboard')
 
-@app.route("/confirm/<string:token>") # EMAIL AUTHENTICATION
+@app.route("/assign/<string:username>", methods=["GET"])
 @login_required
-def confirm(token):
-    if current_user.confirmed:
-        pass
-    elif current_user.confirm(token):
-        flash("Your account is now confirmed")
+def modify(username):
+    if current_user.is_admin:
+        if username:
+            user = User.query.filter_by(username=username).first()
+            if user:
+                return render_template('auth/admin/user-view.html', selected_user=user, title='Manage Users')
+            else:
+                flash_text = 'User with that username selected was not found, go back and try again!'
+                flash(flash_text,'warning')
+                return render_template('auth/admin/admin-dash.html', title='Admin ')
+        else:
+            return render_template('auth/admin/admin-dash.html', title="Admin ")
     else:
-        flash("Your confirmation link is invalid or has expired")
-    return redirect(url_for("index"))
+        return render_template('auth/dashboard.html', title='Dashboard')
+
+
+# @app.route("/confirm/<string:token>") # EMAIL AUTHENTICATION
+# @login_required
+# def confirm(token):
+#     if current_user.confirmed:
+#         pass
+#     elif current_user.confirm(token):
+#         flash("Your account is now confirmed")
+#     else:
+#         flash("Your confirmation link is invalid or has expired")
+#     return redirect(url_for("index"))
 
 @app.route("/settings")
 @login_required
@@ -97,8 +115,6 @@ def settings():
 @login_required
 def view():
     return render_template('auth/view.html', title='View Timesheets')
-
-
 
 """
     REST API Implementation

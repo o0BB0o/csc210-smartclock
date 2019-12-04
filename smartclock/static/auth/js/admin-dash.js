@@ -25,7 +25,9 @@ table.append('<div id = "second" class="list-group"></div>');
 
 // load users with AJAX
 api_url = window.origin + "/api/v1/users"
+
 $.getJSON(api_url, function (response) {
+
     let users = response[0];
     var k = 1;
 
@@ -33,15 +35,19 @@ $.getJSON(api_url, function (response) {
 
         for (let user of users) {
 
-            username = '<a class="list-group-item list-group-item-action" href="' + window.location.href + '">' +
-                user.first_name + ' ' + user.last_name + ' - username: ' + user.username +
-                '<i class="fas fa-user-edit" style="float:right"></i></a>';
+            if ( user.is_admin === false ) {
+                 user_list_item = '<a class="list-group-item list-group-item-action" href="' + window.origin +
+                    '/assign/' + user.username + '">' +
+                    user.first_name + ' ' + user.last_name + ' - username: ' + user.username +
+                    '<i class="fas fa-user-edit" style="float:right"></i></a>';
 
-            console.log(username);
-            if (user.is_approved) {
-                $("#first").append(username);
-            } else {
-                $("#second").append(username);
+//              console.log(user_list_item);
+                if (user.is_approved) {
+                    $("#first").append(user_list_item);
+                } else {
+                    $("#second").append(user_list_item);
+                }
+
             }
         }
 

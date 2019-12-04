@@ -33,7 +33,11 @@
                   {% if current_user.is_admin %}
                   <h4 class="p-1 m-2 text-light bg-info">Supervisor</h4>
                   {% endif %}
+                  {% if current_user.is_approved %}
+                  <h4 class="p-1 m-2 text-primary"><i class="fas fa-globe"></i> Online & Clocked In</h4>
+                  {% else %}
                   <p class="p-0 mb-2">@{{current_user.username}}</p>
+                  {% endif %}
                </div>
                <a class="list-group-item list-group-item-action " href="{{ url_for('dashboard') }}">
                <i class="fas fa-list-alt"></i> Dashboard

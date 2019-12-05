@@ -37,6 +37,8 @@ def register():
 
         flash("You have successfully created your account, login now!", "success")
 
+        send_email2(form.email.data, "registration link", render_template('emailforms/confirm.html', current_user=user, token=user.generate_confirmation_token()))
+
         return redirect(url_for('home'))
 
     return render_template('public/register.html', form=form, title='Register')
@@ -326,9 +328,12 @@ def delete_user(username):
 #
 #
 #
+
 """
     EMAIL Routes & Other Configs
+
 """
+
 @app.route("/confirm/<string:id>/<string:token>")
 def confirm(id, token):
     current_user = User.query.get(id)
@@ -371,8 +376,8 @@ def resetmessage():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             flash("email sent")
-            send_email2(form.email.data, "password reset email", render_template('resetmessage.html', current_user=user, token=user.generate_reset_token()))
+            send_email2(form.email.data, "password reset email", render_template('emailforms/resetmessage.html', current_user=user, token=user.generate_reset_token()))
             return redirect(url_for("home"))
         else:
             flash("invalid email address")
-    return render_template('emailpasswordreset.html', form=form, title="Password Reset")
+    return render_template('public/resetbyemail.html', form=form, title="Password Reset")

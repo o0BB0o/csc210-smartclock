@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SelectField, SubmitField, TimeField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from smartclock.models import User
 
@@ -31,3 +31,13 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember me')
     submit = SubmitField('Sign in')
+
+
+class WeekTimeForm(FlaskForm):
+    week = SelectField('Week', choices=[('Mon','Monday'), ('Tue','Tuesday'), ('Wed', 'Wednesday'), ('Thu', 'Thursday'),
+                                        ('Fri', 'Friday'), ('Sat', 'Saturday'), ('Sun', 'Sunday')], validators=[DataRequired()])
+    start_time = TimeField('Start Time', format="%H:%M", validators=[DataRequired()])
+    end_time = TimeField('End Time', format="%H:%M", validators=[DataRequired()])
+    submit = SubmitField('Save')
+
+

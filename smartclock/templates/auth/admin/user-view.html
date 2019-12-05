@@ -1,16 +1,80 @@
 {% extends "auth/base-auth.html" %}
 {% block content %}
-      <h1 class="font-weight-light border-bottom">Dashboard</h1>
-      <div class="container-fluid bg-white">
-          <div class="row">
-              <div class="col-12">
-                  <h5 class="border-bottom text-secondary pb-2 pt-3 mb-3"> {{selected_user.first_name.capitalize()}} {{selected_user.last_name}}'s Profile! </h5>
-                  <div id="users_table">
-                      <p>Set working hours:</p>
-                      <div class="text-center pb-2">00:00am - 00:00am</div>
-                      <h3  class="text-center">The Site is Under Construction</h3>
+<h1 class="font-weight-light border-bottom">Dashboard</h1>
+<div class="container-fluid bg-white">
+   <div class="row">
+      <div class="col-12">
+         <h5 class="border-bottom text-secondary pb-2 pt-3 mb-3"> Configuring profile for {{selected_user.first_name.capitalize()}} {{selected_user.last_name.capitalize()}}</h5>
+         {% if selected_user.is_approved %}
+         <p class="p-2"> Online Status: {{selected_user.is_approved}}</p>
+         <p class="p-2"> This user is approved </p>
+         {% else %}
+         <p class="p-2"> This user is <strong>not</strong> approved </p>
+         <button type="button" class="btn btn-primary m-2 p-2">Approve Me</button>
+         {% endif %}
+         <div id="users_table">
+            <h5 class="border text-center p-2 m-1">Current Work Schedule:</h5>
+            <div class="text-center pb-2">00:00am - 00:00am</div>
+<!--            <h5 class="border text-center p-2 m-1">Add or Update Work Schedule:</h5>-->
+            <div class="content-section">
+               <form method="POST" action="">
+                  {{ form.hidden_tag() }}
+                  <fieldset class="form-group">
+                     <legend class="border-bottom mb-4">Add or Update Work Schedule:</legend>
+                     <div class="form-group">
+                        {{ form.week.label(class="form-control-label") }}
+<!--                        {% if form.email.errors %}-->
+<!--                        {{ form.email(class="form-control form-control-lg is-invalid") }}-->
+<!--                        <div class="invalid-feedback">-->
+<!--                           {% for error in form.email.errors %}-->
+<!--                           <span>{{ error }}</span>-->
+<!--                           {% endfor %}-->
+<!--                        </div>-->
+<!--                        {% else %}-->
+                        {{ form.week(class="form-control form-control-lg") }}
+<!--                        {% endif %}-->
+                     </div>
+                     <div class="form-group">
+                        {{ form.start_time.label(class="form-control-label") }}
+<!--                        {% if form.email.errors %}-->
+<!--                        {{ form.email(class="form-control form-control-lg is-invalid") }}-->
+<!--                        <div class="invalid-feedback">-->
+<!--                           {% for error in form.email.errors %}-->
+<!--                           <span>{{ error }}</span>-->
+<!--                           {% endfor %}-->
+<!--                        </div>-->
+<!--                        {% else %}-->
+                        {{ form.start_time(class="form-control form-control-lg") }}
+<!--                        {% endif %}-->
+                     </div>
+                     <div class="form-group">
+                        {{ form.end_time.label(class="form-control-label") }}
+<!--                        {% if form.password.errors %}-->
+<!--                        {{ form.password(class="form-control form-control-lg is-invalid") }}-->
+<!--                        <div class="invalid-feedback">-->
+<!--                           {% for error in form.password.errors %}-->
+<!--                           <span>{{ error }}</span>-->
+<!--                           {% endfor %}-->
+<!--                        </div>-->
+<!--                        {% else %}-->
+                        {{ form.end_time(class="form-control form-control-lg") }}
+<!--                        {% endif %}-->
+                     </div>
+<!--                     <div class="form-check">-->
+<!--                        {{ form.remember(class="form-check-input") }}-->
+<!--                        {{ form.remember.label(class="form-check-label") }}-->
+<!--                     </div>-->
+                  </fieldset>
+                  <div class="form-group">
+                     {{ form.submit(class="btn btn-outline-info") }}
                   </div>
-              </div>
-          </div>
+                  <small class="text-muted ml-2">
+                  <a href="#">Forgot Password?</a>
+                  </small>
+               </form>
+            </div>
+         </div>
       </div>
+   </div>
+</div>
 {% endblock %}

@@ -26,24 +26,16 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True)
     first_name = db.Column(db.String(120))
     last_name = db.Column(db.String(120))
-    created_at = db.Column(db.DateTime, default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-
-    num_of_days_missing =  db.Column(db.Integer, default=0)
-    num_of_days_left_early =  db.Column(db.Integer, default=0)
-    num_of_days_coming_late =  db.Column(db.Integer, default=0)
 
     # admin's privileges
-    approved_on = db.Column(db.DateTime, nullable=True)
-    is_approved = db.Column(db.Boolean, default=False, nullable=False)
-    is_admin = db.Column(db.Boolean, default=False, nullable=False)
-    hourly_rate = db.Column(db.Float, default=12.75, nullable=True)
+    is_approved = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, default=False)
 
-    # beyond
-    # email_auth_token = db.Column(db.Text, nullable=True)
-    # is_authenticated = db.Column(db.Boolean, default=False)
 
     # relationships
     timesheets = db.relationship("Timesheet", backref="user")
+    schedules = db.relationship("Schedule", backref="user")
+
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -51,10 +43,26 @@ class User(db.Model, UserMixin):
 class UserSchema(ma.Schema):
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_approved', 'created_at', 'num_of_days_missing', 'num_of_days_left_early', 'num_of_days_coming_late', 'is_admin', 'hourly_rate')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_approved', 'is_admin', 'timesheets', 'schedules')
 
 user_schema = UserSchema(strict=True)
 users_schema = UserSchema(many=True, strict=True)
+
+class Schedule(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    week_day = db.Column(db.String(20))
+    start_time = db.Column(db.String(20))
+    end_time = db.Column(db.String(20))
+    hourly_rate = db.Column(db.Float, default=12.75)
+    user_id = db.Column(db.Integer(),
+                        db.ForeignKey("user.id"))
+class ScheduleSchema(ma.Schema):
+    class Meta:
+        model = Schedule
+        fields = ('id', 'week_day', 'start_time', 'end_time', 'hourly_rate', 'user_id')
+
+schedule_schema = ScheduleSchema(strict=True)
+schedules_schema = ScheduleSchema(many=True, strict=True)
 
 
 class Timesheet(db.Model):

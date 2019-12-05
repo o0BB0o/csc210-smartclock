@@ -31,3 +31,13 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember me')
     submit = SubmitField('Sign in')
+
+
+class SettingsForm(FlaskForm):
+    fname = StringField('New First Name')
+    lname = StringField('New Last Name')
+    email = StringField('New Email')
+    confirm_email = StringField('Confirm New Email', validators=[EqualTo('email')])
+    password = PasswordField('New Password')
+    confirm_password = PasswordField('Confirm New Password', validators=[EqualTo('password')])
+    submit = SubmitField('Change Settings')

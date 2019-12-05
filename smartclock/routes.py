@@ -1,6 +1,6 @@
 from smartclock import app, db
 from flask import render_template, redirect, url_for, flash, request
-from smartclock.forms import RegistrationForm, LoginForm
+from smartclock.forms import RegistrationForm, LoginForm, SettingsForm
 from smartclock.models import User
 from smartclock.functions import check_password, hash_password
 from flask_login import login_user, logout_user, login_required, current_user
@@ -82,10 +82,31 @@ def confirm(token):
         flash("Your confirmation link is invalid or has expired")
     return redirect(url_for("index"))
 
-@app.route("/settings")
+@app.route("/settings", methods=['GET', 'POST'])
 @login_required
 def settings():
-    return render_template('auth/settings.html', title='Settings')
+    form = SettingsForm()
+    if form.validate_on_submit():
+        if(form.lname.data!=""):
+            user = User.query.filter_by(id=current_user.id).first()
+            user.last_name=form.lname.data
+            db.session.commit()
+        if (form.fname.data != ""):
+            user = User.query.filter_by(id=current_user.id).first()
+            user.first_name = form.fname.data
+            db.session.commit()
+        if (form.confirm_email.data != ""):
+            user = User.query.filter_by(id=current_user.id).first()
+            user.email = form.confirm_email.data
+            db.session.commit()
+        if (form.confirm_password.data != ""):
+            user = User.query.filter_by(id=current_user.id).first()
+            hashed_password = hash_password(password=form.password.data)
+            user.password = hashed_password
+            db.session.commit()
+        flash("Updated!")
+        return redirect(url_for("dashboard"))
+    return render_template('auth/settings.html', title='Settings', form=form)
 
 @app.route("/view")
 @login_required

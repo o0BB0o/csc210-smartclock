@@ -3,7 +3,6 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from smartclock.models import User
 
-
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=4, max=20)])
     fname = StringField('First Name', validators=[DataRequired(), Length(min=2, max=20)])
@@ -18,13 +17,11 @@ class RegistrationForm(FlaskForm):
 
         if user:
             raise ValidationError("The username exists")
-
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
 
         if user:
             raise ValidationError("The email exists")
-
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])

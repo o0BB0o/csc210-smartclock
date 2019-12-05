@@ -37,11 +37,10 @@ $.getJSON(api_url, function (response) {
 
             if ( user.is_admin === false ) {
                  user_list_item = '<a class="list-group-item list-group-item-action" href="' + window.origin +
-                    '/assign/' + user.username + '">' +
+                    '/dashboard/' + user.username + '">' +
                     user.first_name + ' ' + user.last_name + ' - username: ' + user.username +
                     '<i class="fas fa-user-edit" style="float:right"></i></a>';
 
-//              console.log(user_list_item);
                 if (user.is_approved) {
                     $("#first").append(user_list_item);
                 } else {

@@ -208,19 +208,63 @@ def get_timesheet(id):
     return timesheet_schema.jsonify(timesheet)
 
 """
-    --> PATCH methods | REST API 
-    
+    --> DELETE methods | REST API 
     Why not put because for now we don't need it since, with patch we can change what we want, without affecting 
     the rest of the fields in our Model, because for put we need to list all fields that are actually in Model, and 
     we should redefine some of them, if we want to keep them.
 """
 
+# delete a user by id
+@app.route('/api/v1/user/<int:id>', methods=['DELETE'])
+def delete_user(id):
+    """
+
+    Before deleting a user, we must check to its child models, if they exist, we should remove them, then remove itself.
+    To avoid database crash, since, its children have its id linked
+
+    """
+    user_to_be_deleted = User.query.filter_by(id=id).first()
+    ts_of_that_user = Timesheet.query.filter_by(user_id=user_to_be_deleted.id).all()
+    sl_of_that_user = Schedule.query.filter_by(user_id=user_to_be_deleted.id).all()
+
+    if not user_to_be_deleted:
+        return jsonify({'message':'user does not exist'})
+
+    if len(ts_of_that_user) > 0:
+        db.session.delete(ts_of_that_user)
+
+    if len(sl_of_that_user) > 0:
+        db.session.delete(sl_of_that_user)
+
+    db.session.delete(user_to_be_deleted)
+    db.session.commit()
+    return user_schema.jsonify(user_to_be_deleted)
+
+
+@app.route('/api/v1/schedule/<int:id>', methods=['DELETE'])
+def delete_schedule(id):
+    sl = Schedule.query.filter_by(id = id).first()
+    if not sl:
+        return jsonify({'message':'grabber of the first schedule, will remove the first'})
+    db.session.delete(sl)
+    db.session.commit()
+    return schedule_schema.jsonify(sl)
+
+@app.route('/api/v1/timesheet/<int:id>', methods=['DELETE'])
+def delete_timesheet(id):
+    ts = Timesheet.query.filter_by(id = id).first()
+    if not ts:
+        return jsonify({'message':'timesheet does not exist'})
+    db.session.delete(ts)
+    db.session.commit()
+    return timesheet_schema.jsonify(ts)
+
 
 # patch a user to clock in
 @app.route('/api/v1/user/<int:uid>', methods=['PATCH'])
-def clock_in_user(uid):
+def patch_user(uid):
 
-    user = User.query.filter_by(username=uid).first()
+    user = User.query.filter_by(id=uid).first()
 
     if user is not None and user.is_approved and not user.is_admin:
         todays_date = datetime.now().date()
@@ -244,24 +288,27 @@ def clock_in_user(uid):
             db.session.commit()
             return user_schema.jsonify(user)
 
-    if user is None:
-        return jsonify({'message':'does not exist'})
-    if not user.is_approved:
-        return jsonify({'message':'user is not yet approved'})
-    if user.is_admin:
-        return jsonify({'message':'user is admin'})
 
     return jsonify({'message':'some_other_errors'})
 
-# patch a user to clock out
-@app.route('/api/v1/users/<username>/out', methods=['PATCH'])
-def clock_out_user(username):
 
+"""
+    --> Custom GET method that returns JSON
+"""
+# patch a user to clock out
+@app.route('/api/v1/func/clock/<string:username>', methods=['GET'])
+def clock_user(username):
+
+    """
+        This function must be only used within that dashboard for approved users, since no error checks are handled.
+    """
     user = User.query.filter_by(username=username).first()
 
-    if user is not None and user.is_approved and not user.is_admin:
+    if user is not None:
         todays_date = datetime.now().date()
         wanted_row = Timesheet.query.filter_by(and_(user_id = user.id, todays_date = todays_date)).first()
+
+        print(f"Shows what wanted_row returns {str(wanted_row)}")
 
         if todays_date == wanted_row.todays_date:
             if wanted_row.is_clocked_in:
@@ -272,66 +319,8 @@ def clock_out_user(username):
             else:
                 return jsonify({'message':'it is already clocked out'})
 
-    if user is None:
-        return jsonify({'message':'does not exist'})
-    if not user.is_approved:
-        return jsonify({'message':'user is not yet approved'})
-    if user.is_admin:
-        return jsonify({'message':'user is admin'})
 
     return jsonify({'message':'some_other_errors'})
-
-
-"""
-    --> DELETE methods | REST API 
-    Why not put because for now we don't need it since, with patch we can change what we want, without affecting 
-    the rest of the fields in our Model, because for put we need to list all fields that are actually in Model, and 
-    we should redefine some of them, if we want to keep them.
-"""
-
-# delete a user by id
-@app.route('/api/v1/user/<int:id>', methods=['DELETE'])
-def delete_user(id):
-    """
-
-    Before deleting a user, we must check to its child models, if they exist, we should remove them, then remove itself.
-
-    """
-    user_to_be_deleted = User.query.filter_by(id=id).first()
-    ts_of_that_user = Timesheet.query.filter_by(user_id=user_to_be_deleted.id).all()
-    sl_of_that_user = Schedule.query.filter_by(user_id=user_to_be_deleted.id).all()
-
-    if not user_to_be_deleted:
-        return jsonify({'message':'user does not exist'})
-
-    if len(ts_of_that_user) > 0:
-        db.session.delete(ts_of_that_user)
-
-    if len(sl_of_that_user) > 0:
-        db.session.delete(sl_of_that_user)
-
-    db.session.delete(user_to_be_deleted)
-    db.session.commit()
-    return user_schema.jsonify(user_to_be_deleted)
-
-
-@app.route('/api/v1/schedule/<int:id>', methods=['DELETE'])
-def del_schedule(id):
-    sl = Schedule.query.filter_by(id = id).first()
-    if not sl:
-        return jsonify({'message':'grabber of the first schedule, will remove the first'})
-    db.session.delete(sl)
-    db.session.commit()
-    return schedule_schema.jsonify(sl)
-
-@app.route('/api/v1/timesheet/<int:id>', methods=['DELETE'])
-def del_timesheet(id):
-    ts = Timesheet.query.filter_by(id = id).first()
-    if not ts:
-        return jsonify({'message':'timesheet does not exist'})
-    db.session.delete(ts)
-    db.session.commit()
-    return timesheet_schema.jsonify(ts)
 
 
 

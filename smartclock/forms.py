@@ -28,3 +28,23 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember me')
     submit = SubmitField('Sign in')
+
+class EmailPasswordForm(FlaskForm):
+    email = StringField("Email", validators=[Email(), DataRequired()])
+    submit = SubmitField("Send password reset email")
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+
+        if user:
+            pass
+        else:
+            raise ValidationError("The email is not active on our server")
+
+class PasswordResetForm(FlaskForm):
+    new_password = PasswordField('New Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('new_password')])
+    submit = SubmitField("Reset")
+
+
+

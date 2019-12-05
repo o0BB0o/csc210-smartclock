@@ -1,11 +1,13 @@
-from smartclock import app, db
+from smartclock import app, db, mail
 from flask import render_template, redirect, url_for, flash, request, jsonify
-from smartclock.forms import RegistrationForm, LoginForm
+from smartclock.forms import RegistrationForm, LoginForm, EmailPasswordForm, PasswordResetForm
 from smartclock.models import User, Timesheet, user_schema, users_schema, timesheet_schema, timesheets_schema
 from smartclock.functions import check_password, hash_password
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
 from sqlalchemy import and_
+from smartclock.email import send_email, send_email2
+
 
 
 @app.route("/")
@@ -46,12 +48,13 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
 
-        if user and check_password(password=form.password.data, hash_=user.password):
+        if user and check_password(password=form.password.data, hash_=user.password) and user.confirmed is True:
             login_user(user, remember=form.remember.data)
             flash("Welcome back!", "info")
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
-
+        elif user and check_password(password = form.password.data, hash_ = user.password) and user.confirmed is False:
+            flash("User account pending --> please check email")
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
 
@@ -87,18 +90,6 @@ def modify(username):
             return render_template('auth/admin/admin.html', title="Admin ")
     else:
         return render_template('auth/dashboard.html', title='Dashboard')
-
-#
-# @app.route("/confirm/<string:token>") # EMAIL AUTHENTICATION
-# @login_required
-# def confirm(token):
-#     if current_user.confirmed:
-#         pass
-#     elif current_user.confirm(token):
-#         flash("Your account is now confirmed")
-#     else:
-#         flash("Your confirmation link is invalid or has expired")
-#     return redirect(url_for("index"))
 
 @app.route("/settings")
 @login_required
@@ -181,7 +172,7 @@ def create_user():
 #
 #     return user_schema.jsonify(user)
 
-# patch an appove
+# patch approve
 @app.route('/api/v1/users/approve/<username>', methods=['PATCH'])
 def patch_user(username):
     user = User.query.filter_by(username=username).first()
@@ -335,3 +326,53 @@ def delete_user(username):
 #
 #
 #
+"""
+    EMAIL Routes & Other Configs
+"""
+@app.route("/confirm/<string:id>/<string:token>")
+def confirm(id, token):
+    current_user = User.query.get(id)
+    if current_user.confirmed:
+        flash("Your account is already activated")
+    elif current_user.confirm(token):
+        flash("Your account is now confirmed")
+        current_user.confirmed = True
+        db.session.commit()
+    else:
+        flash("Your confirmation link is invalid or has expired")
+    return redirect(url_for("home"))
+
+@app.route("/reset/<string:id>/<string:token>", methods=['GET', 'POST'])
+def reset(id, token):
+    form = PasswordResetForm()
+    user = User.query.get(id)
+    if user.confirmresettoken(token):
+        if (form.validate_on_submit()):
+            hashed_password = hash_password(password = form.new_password.data)
+            if(check_password(form.new_password.data, user.password)):
+                flash("Cannot reset password to your current password")
+            else:
+                flash("Password reset!")
+                user.password = hashed_password
+                db.session.commit()
+                return redirect(url_for("home"))
+    else:
+        flash("Your token is invalid and/or expired")
+        return redirect(url_for("home"))
+    return render_template('reset.html', form=form, title= "Password Reset")
+
+
+
+# resetmessage asks for a valid email, then it sends a password reset email to the user
+@app.route("/resetmessage", methods=['GET','POST'])
+def resetmessage():
+    form = EmailPasswordForm()
+    if(form.validate_on_submit()):
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            flash("email sent")
+            send_email2(form.email.data, "password reset email", render_template('resetmessage.html', current_user=user, token=user.generate_reset_token()))
+            return redirect(url_for("home"))
+        else:
+            flash("invalid email address")
+    return render_template('emailpasswordreset.html', form=form, title="Password Reset")

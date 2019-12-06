@@ -45,3 +45,13 @@ class PasswordResetForm(FlaskForm):
     new_password = PasswordField('New Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('new_password')])
     submit = SubmitField("Reset")
+
+class SettingsForm(FlaskForm):
+    fname = StringField('New First Name')
+    lname = StringField('New Last Name')
+    email = StringField('New Email')
+    confirm_email = StringField('Confirm New Email', validators=[EqualTo('email')])
+    old_password = PasswordField('Current Password')
+    password = PasswordField('New Password')
+    confirm_password = PasswordField('Confirm New Password', validators=[EqualTo('password')])
+    submit = SubmitField('Update Settings')

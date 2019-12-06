@@ -1,6 +1,6 @@
 from smartclock import app, db, mail
 from flask import render_template, redirect, url_for, flash, request, jsonify
-from smartclock.forms import RegistrationForm, LoginForm, EmailPasswordForm, PasswordResetForm
+from smartclock.forms import RegistrationForm, LoginForm, EmailPasswordForm, PasswordResetForm,  SettingsForm
 from smartclock.models import User, Timesheet, user_schema, users_schema, timesheet_schema, timesheets_schema
 from smartclock.functions import check_password, hash_password
 from flask_login import login_user, logout_user, login_required, current_user

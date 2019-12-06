@@ -1,5 +1,117 @@
 {% extends "auth/base-auth.html" %}
+{% block more_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='auth/css/settings.css') }}">
+{% endblock %}
 {% block content %}
-      <h1 class="font-weight-light mb-2">Settings</h1>
-      <p>Allows to modify the profile</p>
+    <main class="content">
+   <div class="container">
+      <div class="row">
+               <div class="card-body">
+                  <h5 class="card-title text-center">Settings</h5>
+                  <p class="p-1 text-muted">Leave blank a field if you won't change it</p>
+                  <form class="form-signin" method="post">
+                     {{ form.hidden_tag() }}
+                  <div class="form-label-group">
+                  <p>Your current first name is: {{ current_user.first_name }}</p>
+                        {{ form.fname.label(class="form-control-label") }}
+                        {% if form.fname.errors %}
+                        {{ form.fname(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                           {% for error in form.fname.errors %}
+                           <span>{{ error }}</span>
+                           {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.fname(class="form-control form-control-lg") }}
+                        {% endif %}
+                     </div>
+                  <div class="form-label-group">
+                  <p>Your current last name is: {{ current_user.last_name }}</p>
+                        {{ form.lname.label(class="form-control-label") }}
+                        {% if form.lname.errors %}
+                        {{ form.lname(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                           {% for error in form.lname.errors %}
+                           <span>{{ error }}</span>
+                           {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.lname(class="form-control form-control-lg") }}
+                        {% endif %}
+                     </div>
+                     <div class="form-label-group">
+                         <p>Your current email is: {{ current_user.email }}</p>
+                        {{ form.email.label(class="form-control-label") }}
+                        {% if form.email.errors %}
+                        {{ form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                           {% for error in form.email.errors %}
+                           <span>{{ error }}</span>
+                           {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.email(class="form-control form-control-lg") }}
+                        {% endif %}
+                     </div>
+                  <div class="form-label-group">
+                        {{ form.confirm_email.label(class="form-control-label") }}
+                        {% if form.confirm_email.errors %}
+                        {{ form.confirm_email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                           {% for error in form.confirm_email.errors %}
+                           <span>{{ error }}</span>
+                           {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.confirm_email(class="form-control form-control-lg") }}
+                        {% endif %}
+                     </div>
+                  <div class="form-label-group">
+                  <p>Please enter your current password if you want to change it</p>
+                        {{ form.old_password.label(class="form-control-label") }}
+                        {% if form.old_password.errors %}
+                        {{ form.old_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                           {% for error in form.old_password.errors %}
+                           <span>{{ error }}</span>
+                           {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.old_password(class="form-control form-control-lg") }}
+                        {% endif %}
+                     </div>
+                     <div class="form-label-group">
+                        {{ form.password.label(class="form-control-label") }}
+                        {% if form.password.errors %}
+                        {{ form.password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                           {% for error in form.password.errors %}
+                           <span>{{ error }}</span>
+                           {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.password(class="form-control form-control-lg") }}
+                        {% endif %}
+                     </div>
+                     <div class="form-label-group">
+                        {{ form.confirm_password.label(class="form-control-label") }}
+                        {% if form.confirm_password.errors %}
+                        {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                           {% for error in form.confirm_password.errors %}
+                           <span>{{ error }}</span>
+                           {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.confirm_password(class="form-control form-control-lg") }}
+                        {% endif %}
+                     </div>
+                     {{ form.submit(class="btn btn-lg btn-primary btn-block text-uppercase mt-4") }}
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</main>
 {% endblock %}

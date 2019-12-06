@@ -97,10 +97,40 @@ def modify(username):
     else:
         return render_template('auth/dashboard.html', title='Dashboard')
 
-@app.route("/settings")
+@app.route("/settings", methods=['GET', 'POST'])
 @login_required
 def settings():
-    return render_template('auth/settings.html', title='Settings')
+    form = SettingsForm()
+    if form.validate_on_submit():
+        if(form.lname.data!=""):
+            user = User.query.filter_by(id=current_user.id).first()
+            user.last_name=form.lname.data
+            db.session.commit()
+        if (form.fname.data != ""):
+            user = User.query.filter_by(id=current_user.id).first()
+            user.first_name = form.fname.data
+            db.session.commit()
+        if (form.confirm_email.data != ""):
+            user = User.query.filter_by(id=current_user.id).first()
+            user.email = form.confirm_email.data
+            db.session.commit()
+        if (form.old_password.data != ""):
+            user = User.query.filter_by(id=current_user.id).first()
+            if user and check_password(password=form.old_password.data, hash_=user.password):
+                if(form.confirm_password.data!=""):
+                    user = User.query.filter_by(id=current_user.id).first()
+                    hashed_password = hash_password(password=form.password.data)
+                    user.password = hashed_password
+                    db.session.commit()
+                    flash("Updated!")
+                else:
+                    flash("Password Not Match")
+                    return redirect(url_for("settings"))
+            else:
+                flash("Password Not Match the original one!")
+                return redirect(url_for("settings"))
+        return redirect(url_for("dashboard"))
+    return render_template('auth/settings.html', title='Settings', form=form)
 
 @app.route("/view")
 @login_required
@@ -112,7 +142,7 @@ def view():
 """
 
 """
-    --> CREATE methods | REST API 
+    --> CREATE methods | REST API
 """
 # create a timesheet
 # @app.route('/api/v1/timesheet', methods=['POST'])
@@ -192,7 +222,7 @@ def patch_user(username):
         return jsonify("message", "error")
 
 """
-    --> GET methods | REST API 
+    --> GET methods | REST API
 """
 
 # get all users
@@ -227,9 +257,9 @@ def get_user(username):
 #     return timesheet_schema.jsonify(timesheet)
 
 """
-    --> DELETE methods | REST API 
-    Why not put because for now we don't need it since, with patch we can change what we want, without affecting 
-    the rest of the fields in our Model, because for put we need to list all fields that are actually in Model, and 
+    --> DELETE methods | REST API
+    Why not put because for now we don't need it since, with patch we can change what we want, without affecting
+    the rest of the fields in our Model, because for put we need to list all fields that are actually in Model, and
     we should redefine some of them, if we want to keep them.
 """
 
@@ -336,8 +366,8 @@ def delete_user(username):
 
 """
     EMAIL Routes & Other Configs
-    
-    Currently, the GET, POST, PATCH & other methods of API do not include the field, 'confirmed', since there is no 
+
+    Currently, the GET, POST, PATCH & other methods of API do not include the field, 'confirmed', since there is no
     need because when a user is created it is by default is always false
 
 """

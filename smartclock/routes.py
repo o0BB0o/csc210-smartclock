@@ -37,7 +37,7 @@ def register():
 
         flash("You have successfully created your account, login now!", "success")
 
-        send_email2(form.email.data, "registration link", render_template('emailforms/confirm.html', current_user=user, token=user.generate_confirmation_token()))
+        send_email2(form.email.data, "Thank you for registration, confirm your email!", render_template('emailforms/confirm.html', current_user=user, token=user.generate_confirmation_token()))
 
         return redirect(url_for('home'))
 
@@ -56,7 +56,7 @@ def login():
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         elif user and check_password(password = form.password.data, hash_ = user.password) and user.confirmed is False:
-            flash("User account pending --> please check email")
+            flash("Please verify your email, a confirmation is sent to that email", "warning")
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
 
@@ -137,6 +137,7 @@ def create_user():
     email = request.json['email']
     is_approved = request.json['is_approved']
     is_admin = request.json['is_admin']
+    confirmed = request.json['confirmed']
     timesheets = request.json['timesheets']  # if nothing place []
 
     new_user = User(username=username, timesheets=timesheets, first_name=first_name, last_name=last_name, email=email,
@@ -331,6 +332,9 @@ def delete_user(username):
 
 """
     EMAIL Routes & Other Configs
+    
+    Currently, the GET, POST, PATCH & other methods of API do not include the field, 'confirmed', since there is no 
+    need because when a user is created it is by default is always false
 
 """
 

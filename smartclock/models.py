@@ -80,10 +80,10 @@ class TimesheetSchema(ma.Schema):
         model = Timesheet
         fields = ('id', 'date', 'clock_in_time', 'clock_out_time', 'is_clocked_in', 'user_id')
 
-timesheet_schema = TimesheetSchema(strict=True)
-timesheets_schema = TimesheetSchema(many=True, strict=True)
-user_schema = UserSchema(strict=True)
-users_schema = UserSchema(many=True, strict=True)
+timesheet_schema = TimesheetSchema()
+timesheets_schema = TimesheetSchema(many=True)
+user_schema = UserSchema()
+users_schema = UserSchema(many=True)
 
 if tableDoesNotExist(User.__tablename__):
     db.drop_all()

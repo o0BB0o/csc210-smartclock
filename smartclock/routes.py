@@ -346,13 +346,13 @@ def delete_user(username):
 def confirm(id, token):
     current_user = User.query.get(id)
     if current_user.confirmed:
-        flash("Your account is already activated")
+        flash("Your account is already activated", "info")
     elif current_user.confirm(token):
-        flash("Your account is now confirmed")
+        flash("Your account is now confirmed", "info")
         current_user.confirmed = True
         db.session.commit()
     else:
-        flash("Your confirmation link is invalid or has expired")
+        flash("Your confirmation link is invalid or has expired", "danger")
     return redirect(url_for("home"))
 
 @app.route("/reset/<string:id>/<string:token>", methods=['GET', 'POST'])

@@ -35,7 +35,12 @@
               {% else %}
               <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 p-3 text-center">
                   <h5 class="border-bottom text-secondary"> {{current_user.first_name}} {{current_user.last_name}} </h5>
+                  {% if current_user.confirmed %}
                   <h5 class="pt-3"> Your application is submitted. Wait for your approval by your supervisor! </h5>
+                  {% else %}
+                  <h5 class="pt-3"> Your application is submitted. However, your account confirmation is still pending! </h5>
+                  {% endif %}
+                  <p class="p-1 text-center"> Meanwhile, here you can update your profile with the settings tab! </p>
               </div>
               {% endif %}
 

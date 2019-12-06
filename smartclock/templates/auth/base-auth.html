@@ -47,7 +47,7 @@
                <i class="fas fa-cog"></i> Settings
                </a>
             </div>
-            {% if not current_user.is_admin %}
+            {% if not current_user.is_admin and current_user.is_approved %}
             <div class="list-unstyled m-4">
                <a class="btn btn-outline-secondary btn-lg btn-block mb-3" href="{{ url_for('dashboard') }}"> Clock In</a>
                <a class="btn btn-secondary btn-lg btn-block" href="{{ url_for('dashboard') }}">Clock Out</a>

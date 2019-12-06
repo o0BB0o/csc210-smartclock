@@ -99,12 +99,21 @@ def settings():
             user = User.query.filter_by(id=current_user.id).first()
             user.email = form.confirm_email.data
             db.session.commit()
-        if (form.confirm_password.data != ""):
+        if (form.old_password.data != ""):
             user = User.query.filter_by(id=current_user.id).first()
-            hashed_password = hash_password(password=form.password.data)
-            user.password = hashed_password
-            db.session.commit()
-        flash("Updated!")
+            if user and check_password(password=form.old_password.data, hash_=user.password):
+                if(form.confirm_password.data!=""):
+                    user = User.query.filter_by(id=current_user.id).first()
+                    hashed_password = hash_password(password=form.password.data)
+                    user.password = hashed_password
+                    db.session.commit()
+                    flash("Updated!")
+                else:
+                    flash("Password Not Match")
+                    return redirect(url_for("settings"))
+            else:
+                flash("Password Not Match the original one!")
+                return redirect(url_for("settings"))
         return redirect(url_for("dashboard"))
     return render_template('auth/settings.html', title='Settings', form=form)
 

@@ -38,6 +38,7 @@ class SettingsForm(FlaskForm):
     lname = StringField('New Last Name')
     email = StringField('New Email')
     confirm_email = StringField('Confirm New Email', validators=[EqualTo('email')])
+    old_password = PasswordField('Current Password')
     password = PasswordField('New Password')
     confirm_password = PasswordField('Confirm New Password', validators=[EqualTo('password')])
     submit = SubmitField('Change Settings')

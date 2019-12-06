@@ -41,4 +41,4 @@ class SettingsForm(FlaskForm):
     old_password = PasswordField('Current Password')
     password = PasswordField('New Password')
     confirm_password = PasswordField('Confirm New Password', validators=[EqualTo('password')])
-    submit = SubmitField('Change Settings')
+    submit = SubmitField('Update Settings')

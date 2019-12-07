@@ -58,7 +58,7 @@ def login():
         elif user and check_password(password = form.password.data, hash_ = user.password) and user.confirmed is False:
             login_user(user, remember=form.remember.data)
             if user.confirmed is False:
-                flash("Please verify your email, a confirmation link is sent to that email.", "warning")
+                flash("Please verify your email, a confirmation link is sent to your email.", "warning")
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         else:

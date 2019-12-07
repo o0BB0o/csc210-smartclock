@@ -32,7 +32,7 @@ $('.delete-me').each(function () {
 
 $('.approve-me').on('click', function () {
 	if (confirm('Do you want to approve this account?')) {
-		let url = window.origin + "/api/v1/users/approve/" + username;
+		let url = window.origin + "/api/v1/user/patch/" + username;
 		casted_url = String(url); // I don't know what am I doing...
 		data_json = {
 					"is_approved": true

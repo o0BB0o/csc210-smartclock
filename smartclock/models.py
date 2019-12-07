@@ -19,11 +19,11 @@ class User(db.Model, UserMixin):
     confirmed = db.Column(db.Boolean, default=False) # False == Email not authenticated --> True == Email authenticated
 
 
-# admin's privileges
+    # admin's privileges
     is_approved = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)
 
-# relationships
+    # relationships
     timesheets = db.relationship("Timesheet", backref="user")
 
     def __repr__(self):
@@ -62,18 +62,18 @@ class User(db.Model, UserMixin):
 class Timesheet(db.Model):
     # required
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, nullable=False)
-    todays_date = db.Column(db.DateTime, default=datetime.now(), nullable=False)
-    clock_in_time = db.Column(db.DateTime, nullable=False)
-    clock_out_time = db.Column(db.DateTime, nullable=True)
+    date = db.Column(db.DateTime)
+    todays_date = db.Column(db.DateTime, default=datetime.now())
+    clock_in_time = db.Column(db.DateTime)
+    clock_out_time = db.Column(db.DateTime)
     is_clocked_in = db.Column(db.Boolean, default=False)
-    user_id = db.Column(db.Integer(),
-                        db.ForeignKey("user.id"))
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id"))
 
 class UserSchema(ma.Schema):
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_approved', 'is_admin', 'timesheets')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email',
+                  'is_approved', 'is_admin', 'confirmed', 'timesheets')
 
 class TimesheetSchema(ma.Schema):
     class Meta:

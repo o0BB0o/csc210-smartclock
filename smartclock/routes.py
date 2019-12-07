@@ -8,8 +8,6 @@ from datetime import datetime
 from sqlalchemy import and_
 from smartclock.email import send_email, send_email2
 
-
-
 @app.route("/")
 @app.route("/home")
 def home():
@@ -400,7 +398,7 @@ def reset(id, token):
                 db.session.commit()
                 return redirect(url_for("home"))
     else:
-        flash("Your token is invalid and/or expired")
+        flash("Your token is invalid or expired, start over again", "warning")
         return redirect(url_for("home"))
     return render_template('reset.html', form=form, title= "Password Reset")
 
@@ -413,9 +411,7 @@ def resetmessage():
     if(form.validate_on_submit()):
         user = User.query.filter_by(email=form.email.data).first()
         if user:
-            flash("email sent")
+            flash("If your email exists in our database, it will be sent to your email address for you to confirm!", "info")
             send_email2(form.email.data, "password reset email", render_template('emailforms/resetmessage.html', current_user=user, token=user.generate_reset_token()))
             return redirect(url_for("home"))
-        else:
-            flash("invalid email address")
     return render_template('public/resetbyemail.html', form=form, title="Password Reset")

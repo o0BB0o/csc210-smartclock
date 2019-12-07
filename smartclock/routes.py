@@ -400,7 +400,7 @@ def reset(id, token):
     else:
         flash("Your token is invalid or expired, start over again", "warning")
         return redirect(url_for("home"))
-    return render_template('reset.html', form=form, title= "Password Reset")
+    return render_template('public/reset.html', form=form, title= "Password Reset")
 
 
 

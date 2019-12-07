@@ -35,9 +35,9 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        flash("You have successfully created your account, login now!", "success")
+        flash("You have successfully created your account, confirm your email and start signing in", "success")
 
-        send_email2(form.email.data, "Thank you for registration, confirm your email!", render_template('emailforms/confirm.html', current_user=user, token=user.generate_confirmation_token()))
+        send_email2(form.email.data, "Confirm your email! & Welcome to SmartClock!", render_template('emailforms/confirm.html', current_user=user, token=user.generate_confirmation_token()))
 
         return redirect(url_for('home'))
 
@@ -122,12 +122,12 @@ def settings():
                     hashed_password = hash_password(password=form.password.data)
                     user.password = hashed_password
                     db.session.commit()
-                    flash("Updated!")
+                    flash("Updated!", "success")
                 else:
-                    flash("Password Not Match")
+                    flash("Password Not Match", "danger")
                     return redirect(url_for("settings"))
             else:
-                flash("Password Not Match the original one!")
+                flash("Password didn't match the original one!", "danger")
                 return redirect(url_for("settings"))
         return redirect(url_for("dashboard"))
     return render_template('auth/settings.html', title='Settings', form=form)
@@ -393,9 +393,9 @@ def reset(id, token):
         if (form.validate_on_submit()):
             hashed_password = hash_password(password = form.new_password.data)
             if(check_password(form.new_password.data, user.password)):
-                flash("Cannot reset password to your current password")
+                flash("Cannot reset password to your current password", "danger")
             else:
-                flash("Password reset!")
+                flash("Password reset!", "success")
                 user.password = hashed_password
                 db.session.commit()
                 return redirect(url_for("home"))

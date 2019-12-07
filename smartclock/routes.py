@@ -173,7 +173,7 @@ def create_user():
     timesheets = request.json['timesheets']  # if nothing place []
 
     new_user = User(username=username, timesheets=timesheets, first_name=first_name, last_name=last_name, email=email,
-                    is_admin=is_admin, is_approved=is_approved, password=hashed_password)
+                    is_admin=is_admin, is_approved=is_approved, password=hashed_password, confirmed=confirmed)
 
     db.session.add(new_user)
     db.session.commit()
@@ -214,6 +214,18 @@ def patch_user(username):
     if user:
         is_approved = request.json['is_approved']
         user.is_approved=is_approved
+        db.session.commit()
+        return user_schema.jsonify(user)
+    else:
+        return jsonify("message", "error")
+
+# patch change-admin
+@app.route('/api/v1/users/change-admin/<username>', methods=['PATCH'])
+def patch_admin(username):
+    user = User.query.filter_by(username=username).first()
+    if user:
+        is_admin = request.json['is_admin']
+        user.is_admin=is_admin
         db.session.commit()
         return user_schema.jsonify(user)
     else:

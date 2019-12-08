@@ -42,6 +42,19 @@
                         {% endif %}
                      </div>
                      <div class="form-label-group">
+                        {{ form.token.label(class="form-control-label") }}
+                        {% if form.token.errors %}
+                        {{ form.token(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                           {% for error in form.token.errors %}
+                           <span>{{ error }}</span>
+                           {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.token(class="form-control form-control-lg") }}
+                        {% endif %}
+                     </div>
+                     <div class="form-label-group">
                         {{ form.remember(class="form-check-input ml-2") }}
                         {{ form.remember.label(class="form-check-label ml-4") }}
                      </div>

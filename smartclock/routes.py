@@ -1,10 +1,12 @@
 from smartclock import app, db
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, session, abort
 from smartclock.forms import RegistrationForm, LoginForm, EmailPasswordForm, PasswordResetForm,  SettingsForm
 from smartclock.models import User
 from smartclock.functions import check_password, hash_password
 from flask_login import login_user, logout_user, login_required, current_user
 from smartclock.email import send_email2
+from io import BytesIO
+import pyqrcode
 
 @app.route("/")
 @app.route("/home")
@@ -35,9 +37,46 @@ def register():
 
         send_email2(form.email.data, "Confirm your email! & Welcome to SmartClock!", render_template('emailforms/confirm.html', current_user=user, token=user.generate_confirmation_token()))
 
-        return redirect(url_for('home'))
+        # return redirect(url_for('home'))
+        # redirect to auth page, passing username in session
+        session["username"] = user.username
+        return redirect(url_for("two_factor_setup"))
 
     return render_template('public/register.html', form=form, title='Register')
+
+@app.route("/twofactor")
+def two_factor_setup():
+    if "username" not in session:
+        return redirect(url_for("home"))
+    username = session["username"]
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        return redirect(url_for("home"))
+    # since this page contains the sensitive qrcode,
+    # make sure the browser does not cache it
+    return render_template("public/two-factor-setup.html"), 200, {
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    "Pragma": "no-cache",
+    "Expires": "0"}
+
+@app.route("/qrcode")
+def qrcode():
+    # validate user is currently registering and exists
+    if "username" not in session: abort(404)
+    username = session["username"]
+    user = User.query.filter_by(username=username).first()
+    if user is None: abort(404)
+    # username removed so qr cannot be accessed again
+    del session["username"]
+    # render qrcode for FreeTOTP
+    url = pyqrcode.create(user.get_totp_uri())
+    stream = BytesIO()
+    url.svg(stream, scale=3)
+    return stream.getvalue(), 200, {
+    "Content-Type": "image/svg+xml",
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    "Pragma": "no-cache",
+    "Expires": "0"}
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():

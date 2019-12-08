@@ -63,7 +63,6 @@ class Timesheet(db.Model):
     # required
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime)
-    todays_date = db.Column(db.DateTime, default=datetime.now())
     clock_in_time = db.Column(db.DateTime)
     clock_out_time = db.Column(db.DateTime)
     is_clocked_in = db.Column(db.Boolean, default=False)

@@ -3,9 +3,9 @@ from flask import request, jsonify
 from smartclock.models import User, Timesheet, user_schema, users_schema, timesheet_schema, timesheets_schema
 from smartclock.functions import hash_password
 from datetime import datetime
+from sqlalchemy import and_
 
 # REST API Implementation
-
 # create a timesheet
 @app.route('/api/v1/timesheet', methods=['POST'])
 def create_timesheet():
@@ -24,6 +24,7 @@ def create_timesheet():
 # create a user
 @app.route('/api/v1/user', methods=['POST'])
 def create_user():
+
     username = request.json['username']
     password = request.json['password']
     hashed_password = hash_password(password)
@@ -48,6 +49,7 @@ def create_user():
                        "and confirmed and timesheets")
 
 # with this command update any field of a user except id and password
+# patch method
 @app.route('/api/v1/user/patch/<username>', methods=['PATCH'])
 def patch_anything(username):
     user = User.query.filter_by(username=username).first()
@@ -78,7 +80,7 @@ def patch_anything(username):
 @app.route('/api/v1/users', methods=['GET'])
 def get_users():
     all_users = User.query.all()
-    result =  users_schema.dump(all_users)
+    result = users_schema.dump(all_users)
     return jsonify(result)
 
 # get a user by its username
@@ -130,6 +132,37 @@ def delete_timesheet(id):
     db.session.delete(ts)
     db.session.commit()
     return timesheet_schema.jsonify(ts)
+
+# custom function with patch method for api
+
+@app.route('/api/v1/clock/<username>', methods=['PATCH'])
+def patch_user(username):
+
+    user = User.query.filter_by(username=username).first()
+
+    if user and user.is_approved and not user.is_admin:
+
+        today = datetime.now().date()
+        search = Timesheet.query.filter(Timesheet.user_id == user.id).filter(Timesheet.date==today).first()
+
+        if search:
+            if search.is_clocked_in:
+                return user_schema.jsonify(user)
+            else:
+                search.is_clocked_in = True
+                search.todays_date = datetime.now().date()
+                search.clock_in_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                db.session.commit()
+                return user_schema.jsonify(user)
+        else:
+            new_time_row = Timesheet(is_clocked_in=True, todays_date = datetime.now().date(), clock_in_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"), user_id = user.id)
+            db.session.add(new_time_row)
+            db.session.commit()
+            return user_schema.jsonify(user)
+
+
+    return jsonify({'message':'some_other_errors'})
+
 
 # # patch a user to clock in
 # @app.route('/api/v1/user/<int:uid>', methods=['PATCH'])

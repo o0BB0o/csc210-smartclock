@@ -42,13 +42,26 @@
                         {% endif %}
                      </div>
                      <div class="form-label-group">
+                        {{ form.token.label(class="form-control-label") }}
+                        {% if form.token.errors %}
+                        {{ form.token(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                           {% for error in form.token.errors %}
+                           <span>{{ error }}</span>
+                           {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.token(class="form-control form-control-lg") }}
+                        {% endif %}
+                     </div>
+                     <div class="form-label-group">
                         {{ form.remember(class="form-check-input ml-2") }}
                         {{ form.remember.label(class="form-check-label ml-4") }}
                      </div>
                      {{ form.submit(class="btn btn-lg btn-primary btn-block text-uppercase") }}
                      <a class="d-block text-center mt-3 mb-3" href="{{ url_for('register') }}">Sign Up</a>
                   </form>
-                  <div class="border-top p-2"> <a href="#">Forgot Password?</a></div>
+                  <div class="border-top p-2"> <a href="{{ url_for('resetmessage') }}">Forgot Password?</a></div>
                </div>
             </div>
          </div>

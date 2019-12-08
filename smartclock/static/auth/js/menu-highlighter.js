@@ -30,7 +30,6 @@ function currentFile() {
 	// Step 3: extract the filename from the URL based on the whatever's to the right of
 	//	the last slash
 	currentFileName = currentURL.substr(fileNameIndex);
-	console.log(currentFileName);
 	return currentFileName;
 }
 

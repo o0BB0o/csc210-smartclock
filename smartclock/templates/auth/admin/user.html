@@ -1,0 +1,59 @@
+{% extends "auth/base-auth.html" %}
+{% block content %}
+
+{% if selected_user.is_approved %}
+
+<h1 class="font-weight-light border-bottom">Dashboard</h1>
+<div class="container-fluid bg-white">
+    <div class="row">
+      <div class="col-12">
+         <h5 class="border-bottom text-secondary pb-2 pt-3 mb-3"> Configuring profile for {{selected_user.first_name.capitalize()}} {{selected_user.last_name.capitalize()}}</h5>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-9">
+         <p class="m-0 p-1"> Username: {{selected_user.username}}</p>
+         <p class="m-0 p-1"> Email: {{selected_user.email}}</p>
+         <p class="p-1"> This user is approved </p>
+      </div>
+      <div class="col-3">
+         <p class="p-1"> Joined us on December 3rd, 2019 </p>
+         <button type="button" class="delete-me btn btn-danger p-2">Delete This Account</button>
+      </div>
+    </div>
+    <div class="boxes row text-center">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 p-3">
+            <p class="border border-danger text-danger rounded p-3"> 0 was missing </p>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 p-3">
+            <p class="border border-info text-info rounded p-3"> 0 left early</p>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 p-3">
+            <p class="border border-warning text-warning rounded p-3"> 0 was late </p>
+        </div>
+    </div>
+</div>
+
+{% else %}
+
+<h1 class="font-weight-light border-bottom">Dashboard</h1>
+<div class="container-fluid bg-white">
+   <div class="row">
+      <div class="col-12">
+         <h5 class="border-bottom text-secondary pb-2 pt-3 mb-3"> Configuring profile for {{selected_user.first_name.capitalize()}} {{selected_user.last_name.capitalize()}}</h5>
+         <p class="m-0 p-1 pl-2 text-center"> Signed up on <span id="date">December 4th, 2019</span> </p>
+         <p class="m-0 p-1 pl-2 text-center"> Email: {{selected_user.email}} & Username: {{selected_user.username}}</p>
+         <p class="m-0 p-1 pl-2 text-center"> This user is <u><strong>not</strong></u> approved </p>
+         <button type="button" class="approve-me btn btn-primary btn-block m-2 p-2">Approve</button>
+         <button type="button" class="delete-me btn btn-danger btn-block m-2 p-2">Delete</button>
+      </div>
+   </div>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block more_js %}
+        <script type="text/javascript" src="{{ url_for('static', filename='auth/js/user.js') }}"></script>
+{% endblock %}

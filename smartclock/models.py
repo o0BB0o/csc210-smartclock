@@ -79,7 +79,6 @@ class User(db.Model, UserMixin):
         return True
 
 class Timesheet(db.Model):
-    # required
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime)
     clock_in_time = db.Column(db.DateTime)

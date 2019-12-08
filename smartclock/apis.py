@@ -1,9 +1,9 @@
 from smartclock import app, db
-from flask import request, jsonify
+from flask import request, jsonify, flash, redirect, url_for
 from smartclock.models import User, Timesheet, user_schema, users_schema, timesheet_schema, timesheets_schema
-from smartclock.functions import hash_password
+from smartclock.functions import hash_password, getDuration
 from datetime import datetime
-from sqlalchemy import and_
+from sqlalchemy import and_, desc
 
 # REST API Implementation
 # create a timesheet
@@ -133,96 +133,49 @@ def delete_timesheet(id):
     db.session.commit()
     return timesheet_schema.jsonify(ts)
 
-# custom function with patch method for api
 
+# custom function with patch method for api
 @app.route('/api/v1/clock/<username>', methods=['PATCH'])
 def patch_user(username):
 
     user = User.query.filter_by(username=username).first()
 
-    if user and user.is_approved and not user.is_admin:
-
-        today = datetime.now().date()
-        search = Timesheet.query.filter(Timesheet.user_id == user.id).filter(Timesheet.date==today).first()
-
-        if search:
-            if search.is_clocked_in:
-                return user_schema.jsonify(user)
-            else:
-                search.is_clocked_in = True
-                search.todays_date = datetime.now().date()
-                search.clock_in_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                db.session.commit()
-                return user_schema.jsonify(user)
-        else:
-            new_time_row = Timesheet(is_clocked_in=True, todays_date = datetime.now().date(), clock_in_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"), user_id = user.id)
-            db.session.add(new_time_row)
+    """
+    # Logic
+    if user has no timesheets [] => create one 
+    if user has timesheets:
+        find last created timesheet by filtering date field AS that_row
+        
+        if that_row.is_clocked_in is True:
+            that_row.clock_out_time = datetime.utcnow()
+            that_row.is_clocked_in = False
             db.session.commit()
-            return user_schema.jsonify(user)
+            return timesheet_schema.jsonify(that_row)
+            
+        else:
+            new_stamp = Timesheet(is_clocked_in=True, clock_in_time=utc.now(), date=utc.now())
+            db.session.add(new_stamp)
+            db.session.commit()
+            return timesheet_schema.jsonify(new_stamp)
+    """
 
+    if len(user.timesheets) == 0:
+        new_stamp = Timesheet(is_clocked_in=True, clock_in_time=datetime.utcnow(), date=datetime.utcnow())
+        db.session.add(new_stamp)
+        db.session.commit()
+        return timesheet_schema.jsonify(new_stamp)
+    else:
+        last_stamp = Timesheet.query.filter(Timesheet.user_id == user.id).order_by(desc(Timesheet.time)).limit(1).first()
 
-    return jsonify({'message':'some_other_errors'})
+        with last_stamp as that_row:
+            if that_row.is_clocked_in is True:
+                that_row.clock_out_time = datetime.utcnow()
+                that_row.is_clocked_in = False
+                db.session.commit()
+                return timesheet_schema.jsonify(that_row)
+            else:
+                new_stamp = Timesheet(is_clocked_in=True, clock_in_time=datetime.utcnow(), date=datetime.utcnow())
+                db.session.add(new_stamp)
+                db.session.commit()
+                return timesheet_schema.jsonify(new_stamp)
 
-
-# # patch a user to clock in
-# @app.route('/api/v1/user/<int:uid>', methods=['PATCH'])
-# def patch_user(uid):
-#
-#     user = User.query.filter_by(id=uid).first()
-#
-#     if user is not None and user.is_approved and not user.is_admin:
-#         todays_date = datetime.now().date()
-#         wanted_row = Timesheet.query.filter_by(and_(user_id = user.id, todays_date = todays_date)).first()
-#
-#         if todays_date == wanted_row.todays_date:
-#             if wanted_row.is_clocked_in:
-#                 return user_schema.jsonify(user)
-#             else:
-#                 wanted_row.is_clocked_in = True
-#                 wanted_row.todays_date = datetime.now().date()
-#                 wanted_row.clock_in_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-#                 db.session.commit()
-#                 return user_schema.jsonify(user)
-#         else:
-#             # that means that the user is on a new day to work
-#             # now we will create a new timesheet row which will let to clock in and stamp its time
-#             # then we will add it to the db session
-#             new_time_row = Timesheet(is_clocked_in=True, todays_date = datetime.now().date(), clock_in_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"), user_id = user.id)
-#             db.session.add(new_time_row)
-#             db.session.commit()
-#             return user_schema.jsonify(user)
-#
-#
-#     return jsonify({'message':'some_other_errors'})
-#
-#
-# """
-#     --> Custom GET method that returns JSON
-# """
-# # patch a user to clock out
-# @app.route('/api/v1/func/clock/<string:username>', methods=['GET'])
-# def clock_user(username):
-#
-#     """
-#         This function must be only used within that dashboard for approved users, since no error checks are handled.
-#     """
-#     user = User.query.filter_by(username=username).first()
-#
-#     if user is not None:
-#         todays_date = datetime.now().date()
-#         wanted_row = Timesheet.query.filter_by(and_(user_id = user.id, todays_date = todays_date)).first()
-#
-#         print(f"Shows what wanted_row returns {str(wanted_row)}")
-#
-#         if todays_date == wanted_row.todays_date:
-#             if wanted_row.is_clocked_in:
-#                 wanted_row.is_clocked_in = False
-#                 wanted_row.clock_out_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-#                 db.session.commit()
-#                 return user_schema.jsonify(user)
-#             else:
-#                 return jsonify({'message':'it is already clocked out'})
-#
-#
-#     return jsonify({'message':'some_other_errors'})
-#

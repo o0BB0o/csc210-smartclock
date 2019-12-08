@@ -1,16 +1,16 @@
 from smartclock import app, db
-from flask import request, jsonify, flash, redirect, url_for
+from flask import request, jsonify, abort
 from smartclock.models import User, Timesheet, user_schema, users_schema, timesheet_schema, timesheets_schema
 from smartclock.functions import hash_password, getDuration
 from datetime import datetime
-from sqlalchemy import and_, desc
+from sqlalchemy import desc
 
 # REST API Implementation
 # create a timesheet
 @app.route('/api/v1/timesheet', methods=['POST'])
 def create_timesheet():
     date = request.json['date']
-    todays_date = datetime.now().date()
+    todays_date = datetime.utcnow().date()
     clock_in_time = request.json['clock_in_time']
     clock_out_time = request.json['clock_out_time']
     is_clocked_in = request.json['is_clocked_in']
@@ -27,7 +27,6 @@ def create_user():
 
     username = request.json['username']
     password = request.json['password']
-    hashed_password = hash_password(password)
     first_name = request.json['first_name']
     last_name = request.json['last_name']
     email = request.json['email']
@@ -36,17 +35,14 @@ def create_user():
     confirmed = request.json['confirmed']
     timesheets = request.json['timesheets']
 
-    if username and password and hashed_password and first_name and last_name and email and is_approved and is_admin \
-        and confirmed and timesheets:
-        new_user = User(username=username, timesheets=timesheets, first_name=first_name, last_name=last_name, email=email,
-                        is_admin=is_admin, is_approved=is_approved, password=hashed_password, confirmed=confirmed)
-        db.session.add(new_user)
-        db.session.commit()
-        return user_schema.jsonify(new_user)
-    else:
-        return jsonify("custom_message_error", "one of the fields in the list are missing from username and password"+
-                       "and hashed_password and first_name and last_name and email and is_approved and is_admin "+
-                       "and confirmed and timesheets")
+    hashed_password = hash_password(password)
+
+    new_user = User(username=username, timesheets=timesheets, first_name=first_name, last_name=last_name, email=email,
+                    is_admin=is_admin, is_approved=is_approved, password=hashed_password, confirmed=confirmed)
+    db.session.add(new_user)
+    db.session.commit()
+    return user_schema.jsonify(new_user)
+
 
 # with this command update any field of a user except id and password
 # patch method
@@ -136,9 +132,12 @@ def delete_timesheet(id):
 
 # custom function with patch method for api
 @app.route('/api/v1/clock/<username>', methods=['PATCH'])
-def patch_user(username):
+def clock_user(username):
 
     user = User.query.filter_by(username=username).first()
+
+    if not user.is_approved and user.is_admin:
+        return jsonify({'method':'impossible'})
 
     """
     # Logic
@@ -153,29 +152,29 @@ def patch_user(username):
             return timesheet_schema.jsonify(that_row)
             
         else:
-            new_stamp = Timesheet(is_clocked_in=True, clock_in_time=utc.now(), date=utc.now())
+            new_stamp = Timesheet(is_clocked_in=True, clock_in_time=utcnow(), date=utcnow())
             db.session.add(new_stamp)
             db.session.commit()
             return timesheet_schema.jsonify(new_stamp)
     """
 
+
     if len(user.timesheets) == 0:
-        new_stamp = Timesheet(is_clocked_in=True, clock_in_time=datetime.utcnow(), date=datetime.utcnow())
+        new_stamp = Timesheet(is_clocked_in=True, clock_in_time=datetime.utcnow(), date=datetime.utcnow(), user_id=user.id)
         db.session.add(new_stamp)
         db.session.commit()
         return timesheet_schema.jsonify(new_stamp)
     else:
-        last_stamp = Timesheet.query.filter(Timesheet.user_id == user.id).order_by(desc(Timesheet.time)).limit(1).first()
+        last_stamp = Timesheet.query.filter(Timesheet.user_id == user.id).order_by(desc(Timesheet.date)).limit(1).first()
 
-        with last_stamp as that_row:
-            if that_row.is_clocked_in is True:
-                that_row.clock_out_time = datetime.utcnow()
-                that_row.is_clocked_in = False
-                db.session.commit()
-                return timesheet_schema.jsonify(that_row)
-            else:
-                new_stamp = Timesheet(is_clocked_in=True, clock_in_time=datetime.utcnow(), date=datetime.utcnow())
-                db.session.add(new_stamp)
-                db.session.commit()
-                return timesheet_schema.jsonify(new_stamp)
+        if last_stamp.is_clocked_in is True:
+            last_stamp.clock_out_time = datetime.utcnow()
+            last_stamp.is_clocked_in = False
+            db.session.commit()
+            return timesheet_schema.jsonify(last_stamp)
+        else:
+            new_stamp = Timesheet(is_clocked_in=True, clock_in_time=datetime.utcnow(), date=datetime.utcnow(), user_id=user.id)
+            db.session.add(new_stamp)
+            db.session.commit()
+            return timesheet_schema.jsonify(new_stamp)
 

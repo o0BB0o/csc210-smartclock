@@ -80,24 +80,26 @@ def qrcode():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+
     form = LoginForm()
 
     if form.validate_on_submit():
+
         user = User.query.filter_by(username=form.username.data).first()
 
-        if user and check_password(password=form.password.data, hash_=user.password) and user.confirmed is True:
+        if user and check_password(password=form.password.data, hash_=user.password) and user.verify_totp(form.token.data):
+
             login_user(user, remember=form.remember.data)
-            flash("Welcome back!", "info")
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('dashboard'))
-        elif user and check_password(password = form.password.data, hash_ = user.password) and user.confirmed is False:
-            login_user(user, remember=form.remember.data)
-            if user.confirmed is False:
+
+            if user.confirmed:
+                flash("Welcome back!", "info")
+            else:
                 flash("Please verify your email, a confirmation link is sent to your email.", "warning")
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
+            flash("Invalid username, password, or token.")
+            return redirect(url_for("login"))
 
     return render_template('public/login.html', form=form, title='Log in')
 

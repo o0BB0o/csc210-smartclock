@@ -5,6 +5,7 @@ from smartclock.functions import hash_password, getDuration
 from datetime import datetime
 from sqlalchemy import desc
 
+
 # REST API Implementation
 # create a timesheet
 @app.route('/api/v1/timesheet', methods=['POST'])
@@ -21,10 +22,10 @@ def create_timesheet():
     db.session.commit()
     return timesheet_schema.jsonify(new_timesheet)
 
+
 # create a user
 @app.route('/api/v1/user', methods=['POST'])
 def create_user():
-
     username = request.json['username']
     password = request.json['password']
     first_name = request.json['first_name']
@@ -72,6 +73,7 @@ def patch_anything(username):
     else:
         return jsonify("custom_message_error", "user doesn't exist with that given username")
 
+
 # get all users
 @app.route('/api/v1/users', methods=['GET'])
 def get_users():
@@ -79,38 +81,41 @@ def get_users():
     result = users_schema.dump(all_users)
     return jsonify(result)
 
+
 # get a user by its username
 @app.route('/api/v1/users/<username>', methods=['GET'])
 def get_user(username):
     user = User.query.filter_by(username=username).first()
     if not user:
-        return jsonify({'message':'user does not exist'})
+        return jsonify({'message': 'user does not exist'})
     return user_schema.jsonify(user)
+
 
 # get all timesheets
 @app.route('/api/v1/timesheets', methods=['GET'])
 def get_timesheets():
     all_timesheets = Timesheet.query.all()
-    result =  timesheets_schema.dump(all_timesheets)
+    result = timesheets_schema.dump(all_timesheets)
     return jsonify(result)
+
 
 # get a timesheet by its id
 @app.route('/api/v1/timesheets/<int:id>', methods=['GET'])
 def get_timesheet(id):
     timesheet = Timesheet.query.get_or_404(id)
     if not timesheet:
-        return jsonify({'message':'timesheet does not exist'})
+        return jsonify({'message': 'timesheet does not exist'})
     return timesheet_schema.jsonify(timesheet)
+
 
 # delete a user by id
 @app.route('/api/v1/user/<username>', methods=['DELETE'])
 def delete_user(username):
-
     user_to_be_deleted = User.query.filter_by(username=username).first()
     ts_of_that_user = Timesheet.query.filter_by(user_id=user_to_be_deleted.id).all()
 
     if not user_to_be_deleted:
-        return jsonify({'message':'user does not exist'})
+        return jsonify({'message': 'user does not exist'})
 
     if len(ts_of_that_user) > 0:
         db.session.delete(ts_of_that_user)
@@ -119,12 +124,13 @@ def delete_user(username):
     db.session.commit()
     return user_schema.jsonify(user_to_be_deleted)
 
+
 # delete a timesheet by id
 @app.route('/api/v1/timesheet/<int:id>', methods=['DELETE'])
 def delete_timesheet(id):
-    ts = Timesheet.query.filter_by(id = id).first()
+    ts = Timesheet.query.filter_by(id=id).first()
     if not ts:
-        return jsonify({'message':'timesheet does not exist'})
+        return jsonify({'message': 'timesheet does not exist'})
     db.session.delete(ts)
     db.session.commit()
     return timesheet_schema.jsonify(ts)
@@ -133,11 +139,12 @@ def delete_timesheet(id):
 # custom function with patch method for api
 @app.route('/api/v1/clock/<username>', methods=['PATCH'])
 def clock_user(username):
-
     user = User.query.filter_by(username=username).first()
 
+    if not user:
+        return jsonify({'error': 'was not found'})
     if not user.is_approved and user.is_admin:
-        return jsonify({'method':'impossible'})
+        return jsonify({'error': 'method impossible'})
 
     """
     # Logic
@@ -158,14 +165,15 @@ def clock_user(username):
             return timesheet_schema.jsonify(new_stamp)
     """
 
-
     if len(user.timesheets) == 0:
-        new_stamp = Timesheet(is_clocked_in=True, clock_in_time=datetime.utcnow(), date=datetime.utcnow(), user_id=user.id)
+        new_stamp = Timesheet(is_clocked_in=True, clock_in_time=datetime.utcnow(), date=datetime.utcnow(),
+                              user_id=user.id)
         db.session.add(new_stamp)
         db.session.commit()
         return timesheet_schema.jsonify(new_stamp)
     else:
-        last_stamp = Timesheet.query.filter(Timesheet.user_id == user.id).order_by(desc(Timesheet.date)).limit(1).first()
+        last_stamp = Timesheet.query.filter(Timesheet.user_id == user.id).order_by(desc(Timesheet.date)).limit(
+            1).first()
 
         if last_stamp.is_clocked_in is True:
             last_stamp.clock_out_time = datetime.utcnow()
@@ -173,8 +181,8 @@ def clock_user(username):
             db.session.commit()
             return timesheet_schema.jsonify(last_stamp)
         else:
-            new_stamp = Timesheet(is_clocked_in=True, clock_in_time=datetime.utcnow(), date=datetime.utcnow(), user_id=user.id)
+            new_stamp = Timesheet(is_clocked_in=True, clock_in_time=datetime.utcnow(), date=datetime.utcnow(),
+                                  user_id=user.id)
             db.session.add(new_stamp)
             db.session.commit()
             return timesheet_schema.jsonify(new_stamp)
-

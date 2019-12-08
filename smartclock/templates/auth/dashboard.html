@@ -15,10 +15,10 @@
               {% if current_user.is_approved %}
               <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 p-3 clocks text-center">
                   <article id="timer" class="timer bg-info text-white rounded py-3 mb-2">
-                     <i class="fas fa-stopwatch"></i> 0 seconds
+                      <i class="fas fa-stopwatch"></i> <span id="#timer">0</span>
                   </article>
-<!--                  <div id = "in" class="in btn btn-primary btn-block btn-lg">Not Clocked In <br><i class="fas fa-hourglass-start"></i> <br> <u>Start Shift</u></div>-->
-                  <div id = "out" class="out btn btn-danger btn-block py-2">Already Clocked In <br><i class="fas fa-hourglass-end"></i> <br> <u>End Shift</u></div>
+                  <div id = "offline" class="switch btn btn-primary btn-block btn-lg"> <span class="my-1 px-1 border">Offline</span> <br><i class="fas fa-hourglass-start"></i> <br> <u>Start Shift</u></div>
+                  <div id = "online" class="switch btn btn-danger btn-block py-2"> <span class="p-1 border">Online</span> <br><i class="fas fa-hourglass-end"></i> <br> <u>End Shift</u></div>
               </div>
               <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 p-3">
                   <h5 class="border-bottom text-secondary"> {{current_user.first_name}} {{current_user.last_name}} </h5>

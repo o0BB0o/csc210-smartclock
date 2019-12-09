@@ -1,7 +1,7 @@
 from smartclock import app, db
 from flask import request, jsonify, abort
 from smartclock.models import User, Timesheet, user_schema, users_schema, timesheet_schema, timesheets_schema
-from smartclock.functions import hash_password, getDuration
+from smartclock.functions import hash_password
 from datetime import datetime
 from sqlalchemy import desc
 
@@ -74,11 +74,12 @@ def patch_anything(username):
         return jsonify("custom_message_error", "user doesn't exist with that given username")
 
 
+
 # get all users
 @app.route('/api/v1/users', methods=['GET'])
-def get_users():
-    all_users = User.query.all()
-    result = users_schema.dump(all_users)
+def get_users_all():
+    users = User.query.all()
+    result = users_schema.dump(users)
     return jsonify(result)
 
 
@@ -87,26 +88,49 @@ def get_users():
 def get_user(username):
     user = User.query.filter_by(username=username).first()
     if not user:
-        return jsonify({'message': 'user does not exist'})
+        return jsonify({'custom_error': 'user does not exist'})
     return user_schema.jsonify(user)
+
+# get a user by its id
+@app.route('/api/v1/user/<int:uid>', methods=['GET'])
+def get_user_by_id(uid):
+    user = User.query.filter_by(id=uid).first()
+    if not user:
+        return jsonify({'custom_error': 'user does not exist'})
+    return user_schema.jsonify(user)
+
 
 
 # get all timesheets
 @app.route('/api/v1/timesheets', methods=['GET'])
-def get_timesheets():
+def get_timesheets_all():
     all_timesheets = Timesheet.query.all()
     result = timesheets_schema.dump(all_timesheets)
     return jsonify(result)
 
 
 # get a timesheet by its id
-@app.route('/api/v1/timesheets/<int:id>', methods=['GET'])
-def get_timesheet(id):
-    timesheet = Timesheet.query.get_or_404(id)
+@app.route('/api/v1/timesheet/<int:uid>', methods=['GET'])
+def get_timesheet_by_id(uid):
+    timesheet = Timesheet.query.get_or_404(uid)
     if not timesheet:
         return jsonify({'message': 'timesheet does not exist'})
     return timesheet_schema.jsonify(timesheet)
 
+# get all timesheets for a specific username
+@app.route('/api/v1/timesheets/<string:username>', methods=['GET'])
+def get_timesheets_by_username(username):
+    user = User.query.filter_by(username=username).one_or_none()
+    if user:
+        if user.is_approved and not user.is_admin:
+            timesheets = Timesheet.query.filter_by(user_id=user.id).all()
+            if not timesheets:
+                return jsonify({'custom_error': 'timesheets do not exist'})
+            return timesheets_schema.jsonify(timesheets)
+        else:
+            return jsonify({'custom_error':'user role is invalid'})
+    else:
+        return jsonify({'custom_error':'username is invalid'})
 
 # delete a user by id
 @app.route('/api/v1/user/<username>', methods=['DELETE'])

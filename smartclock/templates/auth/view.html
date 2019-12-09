@@ -5,7 +5,7 @@
           <div class="row">
               <div class="col-12">
                   <h5 class="border-bottom text-secondary pb-2 mb-3">Allows to view timesheets! </h5>
-                  <div id="timesheets_table">
+                  <div id="timesheets_table" class="list-group">
                   </div>
               </div>
           </div>
@@ -13,45 +13,7 @@
 {% endblock %}
 
 {% block more_js %}
-
-var table = $("#timesheets_table");
-
-// load timesheets with AJAX
-api_url = window.origin + "/api/v1/timesheets"
-
-$.getJSON(api_url, function (response) {
-
-    let timesheets = response[0];
-    var k = 1;
-
-    if (!($.isEmptyObject(timesheets))) {
-
-        for (let ts of timesheets) {
-
-            if ( ts.is_admin === false ) {
-                 ts_list_item = '<a class="list-group-item list-group-item-action" href="' + window.origin +
-                    '/dashboard/' + user.username + '">' +
-                    user.first_name + ' ' + user.last_name + ' - username: ' + user.username +
-                    '<i class="fas fa-user-edit" style="float:right"></i></a>';
-
-                if (not ts.is_clocked_in) {
-                    table.append(ts_list_item);
-                } else {
-                    $("#second").append(user_list_item);
-                }
-
-            }
-        }
-
-        $('#content .list-group-item-action').each(function () {
-            $(this).prepend(k.toString() + '. ');
-            k++;
-        });
-
-    }
-
-});
-
-
+        <script type="text/javascript" src="{{ url_for('static', filename='lib/moment/moment-min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='auth/js/view.js') }}"></script>
 {% endblock %}
 

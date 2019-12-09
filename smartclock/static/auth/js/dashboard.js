@@ -16,7 +16,6 @@ username = $("#username").text();
 username = username.trim();
 
 btn_online_end_shift.hide();
-btn_online_end_shift.hide();
 
 $('.switch').each(function () {
 	$(this).on('click', function () {
@@ -40,21 +39,22 @@ $('.switch').each(function () {
                 })
                 .done(function (response) {
                     var data = response;
-                    alert(JSON.stringify(data));
                     if (data.is_clocked_in === true) {
-                        btn_offline_start_shift.show();
-                        btn_online_end_shift.hide();
+                        btn_offline_start_shift.hide();
+                        btn_online_end_shift.show();
 //                        stop_watch.text(getStamp(start=data.clock_in_time, end=data.clock_out_time));
                         message_time = "started at "+moment(data.clock_in_time).format('MMMM Do YYYY, h:mm:ss a');
-                        mess.text(message_time);
+//                        mess.text(message_time);
+                        alert(message_time);
                     } else {
-                        btn_online_end_shift.show();
-                        btn_offline_start_shift.hide();
+                        btn_offline_start_shift.show();
+                        btn_online_end_shift.end();
                         // brings an alert box
                         start_time = "started at "+moment(data.clock_in_time).format('MMMM Do YYYY, h:mm:ss a')+"\n";
                         end_time = "ended at "+moment(data.clock_out_time).format('MMMM Do YYYY, h:mm:ss a');
                         message_time = start_time + end_time;
-                        mess.html(message_time);
+//                        mess.html(message_time);
+                        alert(message_time);
                     }
                 })
                 .fail(function (xhr, status, description) {

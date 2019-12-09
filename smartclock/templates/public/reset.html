@@ -1,0 +1,54 @@
+{% extends "public/base.html" %}
+{% block more_css %}
+<!-- Re-using it from login.css -->
+<link rel="stylesheet" href="{{ url_for('static', filename='public/css/login.css') }}">
+{% endblock %}
+{% block content %}
+
+<main class="content">
+   <div class="container">
+      <div class="row">
+         <div class="col-12 mx-auto">
+            <div class="card card-signin flex-row my-5">
+               <div class="card-img-left d-none d-md-flex">
+                  <!-- Background image for card set in CSS! -->
+               </div>
+               <div class="card-body">
+                  <h5 class="card-title text-center">Resetting Password</h5>
+                  <form class="form-signin" method="post">
+                     {{ form.hidden_tag() }}
+                     <div class="form-label-group">
+                        {{ form.new_password.label(class="form-control-label") }}
+                        {% if form.new_password.errors %}
+                        {{ form.new_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                           {% for error in form.new_password.errors %}
+                           <span>{{ error }}</span>
+                           {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.new_password(class="form-control form-control-lg") }}
+                        {% endif %}
+                     </div>
+                     <div class="form-label-group">
+                        {{ form.confirm_password.label(class="form-control-label") }}
+                        {% if form.confirm_password.errors %}
+                        {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                           {% for error in form.confirm_password.errors %}
+                           <span>{{ error }}</span>
+                           {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.confirm_password(class="form-control form-control-lg") }}
+                        {% endif %}
+                     </div>
+                     {{ form.submit(class="btn btn-lg btn-primary btn-block text-uppercase") }}
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</main>
+{% endblock %}

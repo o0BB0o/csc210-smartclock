@@ -3,7 +3,6 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from smartclock.models import User
 
-
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=4, max=20)])
     fname = StringField('First Name', validators=[DataRequired(), Length(min=2, max=20)])
@@ -18,16 +17,42 @@ class RegistrationForm(FlaskForm):
 
         if user:
             raise ValidationError("The username exists")
-
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
 
         if user:
             raise ValidationError("The email exists")
 
-
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
+    token = StringField("Token", validators=[DataRequired(), Length(6, 6)])
     remember = BooleanField('Remember me')
     submit = SubmitField('Sign in')
+
+class EmailPasswordForm(FlaskForm):
+    email = StringField("Email", validators=[Email(), DataRequired()])
+    submit = SubmitField("Send password reset email")
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+
+        if user:
+            pass
+        else:
+            raise ValidationError("The email is not active on our server")
+
+class PasswordResetForm(FlaskForm):
+    new_password = PasswordField('New Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('new_password')])
+    submit = SubmitField("Reset")
+
+class SettingsForm(FlaskForm):
+    fname = StringField('New First Name')
+    lname = StringField('New Last Name')
+    email = StringField('New Email')
+    confirm_email = StringField('Confirm New Email', validators=[EqualTo('email')])
+    old_password = PasswordField('Current Password')
+    password = PasswordField('New Password')
+    confirm_password = PasswordField('Confirm New Password', validators=[EqualTo('password')])
+    submit = SubmitField('Update Settings')

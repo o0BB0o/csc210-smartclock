@@ -1,6 +1,7 @@
 from smartclock import app, db, ma, login_manager
 from flask_login import UserMixin
 from smartclock.functions import tableDoesNotExist
+from datetime import datetime
 from itsdangerous import TimedJSONWebSignatureSerializer \
     as Serializer
 import base64, os, onetimepass
@@ -50,7 +51,7 @@ class User(db.Model, UserMixin):
         s = Serializer(app.config["SECRET_KEY"], expiration)
         return s.dumps({"confirm": self.id}).decode("utf-8")
 
-    def generate_reset_token(self, expiration=3600):
+    def generate_reset_token(self, expiration=600):
         s = Serializer(app.config["SECRET_KEY"], expiration)
         return s.dumps({"reset": self.id}).decode("utf-8")
 

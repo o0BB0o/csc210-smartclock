@@ -1,6 +1,6 @@
 from smartclock import app, db
 from flask import render_template, redirect, url_for, flash, request, session, abort
-from smartclock.forms import RegistrationForm, LoginForm, EmailPasswordForm, PasswordResetForm,  SettingsForm
+from smartclock.forms import RegistrationForm, LoginForm, EmailPasswordForm, PasswordResetForm,  SettingsForm, TokenForm
 from smartclock.models import User
 from smartclock.functions import check_password, hash_password
 from flask_login import login_user, logout_user, login_required, current_user
@@ -86,11 +86,20 @@ def login():
     if form.validate_on_submit():
 
         user = User.query.filter_by(username=form.username.data).first()
+        if user and check_password(password=form.password.data, hash_=user.password):
+            return redirect(url_for("login2fa", username=form.username.data, remember=form.remember.data))
+        else:
+            flash("Invalid username or password")
+            return redirect(url_for("login"))
+    return render_template('public/login.html', form=form, title="login")
 
-        if user and check_password(password=form.password.data, hash_=user.password) and user.verify_totp(form.token.data):
-
-            login_user(user, remember=form.remember.data)
-
+@app.route("/login2fa/<string:username>/<string:remember>", methods=['GET', 'POST'])
+def login2fa(username, remember):
+    form = TokenForm()
+    user = User.query.filter_by(username=username).first()
+    if form.validate_on_submit():
+        if user.verify_totp(form.token.data):
+            login_user(user, remember = remember)
             if user.confirmed:
                 flash("Welcome back!", "info")
             else:
@@ -98,10 +107,32 @@ def login():
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         else:
-            flash("Invalid username, password, or token.")
-            return redirect(url_for("login"))
+            flash("Invalid token")
+            return redirect(url_for("login2fa", username=username, remember=remember))
+    return render_template('public/2fa.html', form=form, email=user.email, remember=remember, title='token login')
 
-    return render_template('public/login.html', form=form, title='Log in')
+@app.route("/tfa_token/<string:email>/<string:remember>")
+def tfa_token(email, remember):
+    user = User.query.filter_by(email=email).first()
+    t = user.generate_confirmation_token()
+    send_email2(user.email, "Login Token", render_template('emailforms/twofactoremail.html', token=t))
+    flash("email sent!")
+    t = hash_password(t)
+    return redirect(url_for('two_factor_email', email=email, remember=remember, t = t))
+
+
+@app.route("/two_factor_email/<string:email>/<string:remember>/<string:t>", methods=['GET','POST'])
+def two_factor_email(email, remember, t):
+    form = TokenForm()
+    user = User.query.filter_by(email=email).first()
+    if form.validate_on_submit():
+        if(check_password(form.token.data, hash_=t)):
+            login_user(user, remember = remember)
+            return redirect(url_for('dashboard'))
+        else:
+            flash("invalid token")
+            return redirect(url_for('two_factor_email', email=email, remember=remember, t = t))
+    return render_template('public/2fa_email.html', form=form, title='email token login')
 
 @app.route("/logout")
 @login_required
@@ -139,34 +170,38 @@ def modify(username):
 def settings():
     form = SettingsForm()
     if form.validate_on_submit():
-        if(form.lname.data!=""):
-            user = User.query.filter_by(id=current_user.id).first()
-            user.last_name=form.lname.data
-            db.session.commit()
-        if (form.fname.data != ""):
-            user = User.query.filter_by(id=current_user.id).first()
-            user.first_name = form.fname.data
-            db.session.commit()
-        if (form.confirm_email.data != ""):
-            user = User.query.filter_by(id=current_user.id).first()
-            user.email = form.confirm_email.data
-            db.session.commit()
-        if (form.old_password.data != ""):
-            user = User.query.filter_by(id=current_user.id).first()
-            if user and check_password(password=form.old_password.data, hash_=user.password):
-                if(form.confirm_password.data!=""):
-                    user = User.query.filter_by(id=current_user.id).first()
-                    hashed_password = hash_password(password=form.password.data)
-                    user.password = hashed_password
-                    db.session.commit()
-                    flash("Updated!", "success")
+        user = User.query.filter_by(id=current_user.id).first()
+        if(user and check_password(form.old_password.data, hash_=user.password)):
+            if(form.lname.data!=""):
+                user.last_name=form.lname.data
+                db.session.commit()
+                flash("last name updated!")
+            if (form.fname.data != ""):
+                user.first_name = form.fname.data
+                db.session.commit()
+                flash("first name updated!")
+            if (form.confirm_email.data != ""):
+                if(user.email == form.email.data):
+                    flash("Cannot change email to your current email!")
                 else:
-                    flash("Password Not Match", "danger")
-                    return redirect(url_for("settings"))
+                    user.email = form.email.data
+                    db.session.commit()
+                    flash("email updated!")
+            if (form.old_password.data != ""):
+                if(form.confirm_password.data!=""):
+                    if(not check_password(form.confirm_password.data, hash_=user.password)):
+                        hashed_password = hash_password(password=form.password.data)
+                        user.password = hashed_password
+                        db.session.commit()
+                        flash("password updated")
+                    else:
+                        flash("Cannot change password to your current password!")
             else:
                 flash("Password didn't match the original one!", "danger")
                 return redirect(url_for("settings"))
-        return redirect(url_for("dashboard"))
+        else:
+            flash("Current Password incorrect")
+        return redirect(url_for("settings"))
     return render_template('auth/settings.html', title='Settings', form=form)
 
 @app.route("/view")

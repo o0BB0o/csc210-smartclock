@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
 from smartclock.models import User
 
 class RegistrationForm(FlaskForm):
@@ -26,7 +26,6 @@ class RegistrationForm(FlaskForm):
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
-    token = StringField("Token", validators=[DataRequired(), Length(6, 6)])
     remember = BooleanField('Remember me')
     submit = SubmitField('Sign in')
 
@@ -42,17 +41,21 @@ class EmailPasswordForm(FlaskForm):
         else:
             raise ValidationError("The email is not active on our server")
 
+class TokenForm(FlaskForm):
+    token = StringField("Token", validators=[DataRequired()])
+    submit = SubmitField("Confirm")
+
 class PasswordResetForm(FlaskForm):
     new_password = PasswordField('New Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('new_password')])
     submit = SubmitField("Reset")
 
 class SettingsForm(FlaskForm):
-    fname = StringField('New First Name')
-    lname = StringField('New Last Name')
-    email = StringField('New Email')
+    fname = StringField('New First Name', validators=[Optional(), Length(min=2, max=20)])
+    lname = StringField('New Last Name', validators=[Optional(), Length(min=2, max=20)])
+    email = StringField('New Email', validators=[Optional(), Email()])
     confirm_email = StringField('Confirm New Email', validators=[EqualTo('email')])
-    old_password = PasswordField('Current Password')
+    old_password = PasswordField('Current Password', validators=[DataRequired()])
     password = PasswordField('New Password')
     confirm_password = PasswordField('Confirm New Password', validators=[EqualTo('password')])
     submit = SubmitField('Update Settings')

@@ -24,7 +24,6 @@ def register():
         return redirect(url_for('home'))
 
     form = RegistrationForm()
-
     if form.validate_on_submit():
         hashed_password = hash_password(password=form.password.data)
         user = User(username=form.username.data, password=hashed_password, email=form.email.data,

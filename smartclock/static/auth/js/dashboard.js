@@ -38,6 +38,7 @@ $('.switch').each(function () {
                 })
                 .done(function (response) {
                     var data = response;
+                    alert(JSON.stringify(data));
                     if (data.is_clocked_in === true) {
                         btn_in.show();
                         btn_out.hide();

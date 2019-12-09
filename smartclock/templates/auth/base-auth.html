@@ -47,6 +47,12 @@
                <i class="fas fa-cog"></i> Settings
                </a>
             </div>
+            {% if not current_user.is_admin and current_user.is_approved %}
+            <div class="list-unstyled m-4">
+               <a class="btn btn-outline-secondary btn-lg btn-block mb-3" href="{{ url_for('dashboard') }}"> Clock In</a>
+               <a class="btn btn-secondary btn-lg btn-block" href="{{ url_for('dashboard') }}">Clock Out</a>
+            </div>
+            {% endif %}
          </nav>
          <!-- Page Content  -->
          <div id="content">
@@ -66,7 +72,7 @@
                      </div>
                      <!-- Navbar Left Side -->
                      <div class="nav navbar-nav ml-auto">
-                        <a class="nav-item nav-link active" href="{{ url_for('dashboard') }}"><i class="fas fa-user-circle"></i> <span id="username">{{current_user.username}}</span></a>
+                        <a class="nav-item nav-link active" href="{{ url_for('dashboard') }}"><i class="fas fa-user-circle"></i> {{current_user.username.capitalize()}}</a>
                         <a class="nav-item nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
                      </div>
                   </div>
@@ -85,9 +91,9 @@
             {% endblock %}
          </div>
       </div>
-      <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery/jquery-3.4.1.min.js') }}"></script>
-      <script type="text/javascript" src="{{ url_for('static', filename='lib/bootstrap/js/bootstrap.min.js') }}" ></script>
+      <script  type="text/javascript" src="{{ url_for('static', filename='lib/jquery/jquery-3.4.1.min.js') }}"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+      <script type="text/javascript" src="{{ url_for('static', filename='lib/bootstrap/js/bootstrap.min.js') }}" ></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
       <script type="text/javascript" src="{{ url_for('static', filename='auth/js/base-auth.js') }}"></script>
       <script type="text/javascript" src="{{ url_for('static', filename='auth/js/menu-highlighter.js') }}"></script>

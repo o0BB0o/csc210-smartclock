@@ -12,6 +12,20 @@
                   <form class="form-signin" method="post">
                      {{ form.hidden_tag() }}
                   <div class="form-label-group">
+                  <p>*REQUIRED* Please enter your current password</p>
+                        {{ form.old_password.label(class="form-control-label") }}
+                        {% if form.old_password.errors %}
+                        {{ form.old_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                           {% for error in form.old_password.errors %}
+                           <span>{{ error }}</span>
+                           {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.old_password(class="form-control form-control-lg") }}
+                        {% endif %}
+                     </div>
+                  <div class="form-label-group">
                   <p>Your current first name is: {{ current_user.first_name }}</p>
                         {{ form.fname.label(class="form-control-label") }}
                         {% if form.fname.errors %}
@@ -64,20 +78,6 @@
                         </div>
                         {% else %}
                         {{ form.confirm_email(class="form-control form-control-lg") }}
-                        {% endif %}
-                     </div>
-                  <div class="form-label-group">
-                  <p>Please enter your current password if you want to change it</p>
-                        {{ form.old_password.label(class="form-control-label") }}
-                        {% if form.old_password.errors %}
-                        {{ form.old_password(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                           {% for error in form.old_password.errors %}
-                           <span>{{ error }}</span>
-                           {% endfor %}
-                        </div>
-                        {% else %}
-                        {{ form.old_password(class="form-control form-control-lg") }}
                         {% endif %}
                      </div>
                      <div class="form-label-group">

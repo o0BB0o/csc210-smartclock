@@ -116,7 +116,10 @@ def dashboard():
     if current_user.is_admin:
         return render_template('auth/admin/admin.html', title='Dashboard')
     else:
-        return render_template('auth/dashboard.html', title='Dashboard')
+        return render_template('auth/dashboard.html', title='Dashboard'), 200, {
+    "Cache-Control": "no-cache, no-store",
+    "Pragma": "no-cache",
+    "Expires": "0"}
 
 @app.route("/dashboard/<string:username>", methods=["GET"])
 @login_required

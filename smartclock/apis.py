@@ -161,7 +161,7 @@ def delete_timesheet(id):
 
 
 # custom function with patch method for api
-@app.route('/api/v1/clock/<username>', methods=['PATCH'])
+@app.route('/api/v1/clock/<username>', methods=['GET'])
 def clock_user(username):
     user = User.query.filter_by(username=username).first()
 

@@ -12,7 +12,8 @@
 
         $.getJSON(api_url, function (response) {
 
-            let timesheets = response[0];
+            console.log(JSON.stringify(response));
+            let timesheets = response;
             var k = 1;
 
             if (!($.isEmptyObject(timesheets))) {

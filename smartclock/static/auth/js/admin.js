@@ -28,7 +28,7 @@ api_url = window.origin + "/api/v1/users"
 
 $.getJSON(api_url, function (response) {
 
-    let users = response[0];
+    let users = response;
     var k = 1;
 
     if (!($.isEmptyObject(users))) {

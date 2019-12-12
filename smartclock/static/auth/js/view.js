@@ -19,12 +19,15 @@
             if (!($.isEmptyObject(timesheets))) {
 
                 for (let ts of timesheets) {
-
-                 ts_list_item = '<p class="list-group-item text-center text-white"> clock in time: ' +
-                    format(ts.clock_in_time) + '<br> clock out time: ' + format(ts.clock_out_time) + '<br> date: ' + format(ts.date) + '</p>';
+                    if(ts.clock_out_time == null) {
+                        ts_list_item = '<p class="list-group-item text-center text-white"> clock in time: ' +
+                        format(ts.clock_in_time) + '<br> clock out time: Still Online<br> date: ' + format(ts.date) + '</p>';
+                    } else {
+                        ts_list_item = '<p class="list-group-item text-center text-white"> clock in time: ' +
+                        format(ts.clock_in_time) + '<br> clock out time:' + format(ts.clock_out_time) + '<br> date: ' + format(ts.date) + '</p>';
+                    }
 
                  table.append(ts_list_item);
-
                 }
                 $('#timesheets_table .list-group-item').each(function () {
                     $(this).addClass(myArray[Math.floor(Math.random() * myArray.length)]);

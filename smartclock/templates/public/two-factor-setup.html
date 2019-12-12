@@ -1,7 +1,18 @@
 {% extends "public/base.html" %}
 {% block content %}
     <h1>Two Factor Authentication Setup</h1>
-    <p class="text-center">Before you submit this form, please ensure you have <a href="https://authy.com/">Authy</a> installed on your smartphone, as you will need it to complete your registration. Download from <a href="https://itunes.apple.com/us/app/authy/id494168017">iTunes</a> | <a href="https://play.google.com/store/apps/details?id=com.authy.authy">Google Play</a></p>
+    <p class="text-center">Before you submit this form, please ensure you have one of the following two-factor authenticator apps installed on your smartphone as you will need it to complete your registration.</p>
+                    <div class="text-center">
+                            <a href="https://authy.com/download/" target="_blank">
+                                <img alt="Authy" src="https://www.pythonanywhere.com/user/smartclock/files/home/smartclock/web/smartclock/static/image/authy.png" width="100">
+                            </a>
+                           <a href="https://duo.com/product/trusted-users/two-factor-authentication/duo-mobile" target="_blank">
+                                <img alt="Duo Mobile" src="https://www.pythonanywhere.com/user/smartclock/files/home/smartclock/web/smartclock/static/image/duo.png" width="100">
+                            </a>
+                            <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">
+                                <img alt="Google Authenticator" src="https://www.pythonanywhere.com/user/smartclock/files/home/smartclock/web/smartclock/static/image/google-auth.png" width="100">
+                            </a>
+                    </div>
     <p><img id="qrcode" src="{{ url_for('qrcode') }}"></p>
     <p>I'm done, take me to the <a href="{{ url_for('login') }}">Login</a> page!</p>
 {% endblock %}

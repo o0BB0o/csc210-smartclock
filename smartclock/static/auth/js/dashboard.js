@@ -5,27 +5,46 @@ function updateTime() {
             setTimeout(updateTime, 1000);
         }
 updateTime();
-
 btn_offline_start_shift = $("#offline");
 btn_online_end_shift = $("#online");
-
-stop_watch = $("#time");
-mess = $("#message");
-
+btn_offline_start_shift.hide();
+btn_online_end_shift.hide();
 username = $("#username").text();
 username = username.trim();
 
-btn_online_end_shift.hide();
+function checkOnline() {
+    let url = window.origin + "/api/v1/clock/" + username;
+    casted_url = String(url);
+    $.ajax({
+        "url": casted_url,
+        "dataType": "json",
+        "contentType": "application/json",
+        "type": "GET"
+    })
+        .done(function (response) {
+            var data = response;
+            if (data.is_clocked_in == true) {
+                btn_offline_start_shift.hide();
+                btn_online_end_shift.show();
+                var online = true;
+            } else {
+                btn_offline_start_shift.hide();
+                btn_online_end_shift.show();
+                var online = false;
+                    }
+                })
+}
+checkOnline();
+stop_watch = $("#time");
+mess = $("#message");
 
 $('.switch').each(function () {
 	$(this).on('click', function () {
-	    val = $(this).attr('value');
-        var msg = "";
-
-	    if (val === "offline") {
+	    if (online == false) {
 	        msg = "Do you want to clock in?";
 	    } else {
 	        msg = "Do you want to clock out?";
+
 	    }
 		if (confirm(msg)) {
 			let url = window.origin + "/api/v1/clock/" + username;
@@ -39,16 +58,18 @@ $('.switch').each(function () {
                 })
                 .done(function (response) {
                     var data = response;
-                    if (data.is_clocked_in === true) {
+                    if (data.is_clocked_in == true&&online = true) {
                         btn_offline_start_shift.hide();
                         btn_online_end_shift.show();
 //                        stop_watch.text(getStamp(start=data.clock_in_time, end=data.clock_out_time));
+                        letscount(new Date());
                         message_time = "started at "+moment(data.clock_in_time).format('MMMM Do YYYY, h:mm:ss a');
 //                        mess.text(message_time);
                         alert(message_time);
                     } else {
+                        online = false;
                         btn_offline_start_shift.show();
-                        btn_online_end_shift.end();
+                        btn_online_end_shift.hide();
                         // brings an alert box
                         start_time = "started at "+moment(data.clock_in_time).format('MMMM Do YYYY, h:mm:ss a')+"\n";
                         end_time = "ended at "+moment(data.clock_out_time).format('MMMM Do YYYY, h:mm:ss a');
@@ -70,6 +91,51 @@ $('.switch').each(function () {
 		}
 	});
 });
+
+function letscount(letitbetime) {
+	var defaults = {},
+		one_second = 1000,
+		one_minute = one_second * 60,
+		one_hour = one_minute * 60,
+		one_day = one_hour * 24,
+		startDate = letitbetime,
+		face = document.getElementById('time');
+
+	var requestAnimationFrame = (function () {
+		return window.requestAnimationFrame ||
+			window.webkitRequestAnimationFrame ||
+			window.mozRequestAnimationFrame ||
+			window.oRequestAnimationFrame ||
+			window.msRequestAnimationFrame ||
+			function (callback) {
+				window.setTimeout(callback, 1000 / 60);
+			};
+	}());
+
+	tick();
+
+	function tick() {
+
+		var now = new Date(),
+			elapsed = now - startDate,
+			parts = [];
+
+		parts[0] = '' + Math.floor(elapsed / one_hour);
+		parts[1] = '' + Math.floor((elapsed % one_hour) / one_minute);
+		parts[2] = '' + Math.floor(((elapsed % one_hour) % one_minute) / one_second);
+
+		parts[0] = (parts[0].length == 1) ? '0' + parts[0] : parts[0];
+		parts[1] = (parts[1].length == 1) ? '0' + parts[1] : parts[1];
+		parts[2] = (parts[2].length == 1) ? '0' + parts[2] : parts[2];
+
+		face.innerText = parts.join(':');
+
+		requestAnimationFrame(tick);
+
+	}
+}
+
+
 //
 //function getStamp(start, end, al=false) {
 //    // start time and end time

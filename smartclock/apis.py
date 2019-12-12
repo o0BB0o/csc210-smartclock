@@ -172,16 +172,16 @@ def clock_user(username):
 
     """
     # Logic
-    if user has no timesheets [] => create one 
+    if user has no timesheets [] => create one
     if user has timesheets:
         find last created timesheet by filtering date field AS that_row
-        
+
         if that_row.is_clocked_in is True:
             that_row.clock_out_time = datetime.utcnow()
             that_row.is_clocked_in = False
             db.session.commit()
             return timesheet_schema.jsonify(that_row)
-            
+
         else:
             new_stamp = Timesheet(is_clocked_in=True, clock_in_time=utcnow(), date=utcnow())
             db.session.add(new_stamp)

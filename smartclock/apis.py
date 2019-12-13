@@ -227,7 +227,7 @@ def get_clock_bool(username):
     last_stamp = Timesheet.query.filter(Timesheet.user_id == user.id).order_by(desc(Timesheet.date)).limit(1).first()
 
     if last_stamp.is_clocked_in is True:
-        return jsonify({'clock_status': True})
+        return jsonify({'clock_status': True,'last_time':last_stamp.clock_in_time})
     else:
         return jsonify({'clock_status': False})
 

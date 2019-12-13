@@ -4,8 +4,12 @@
         }
         var table = $("#timesheets_table");
 
+
+        get_username = $("#username").text();
+        username = get_username.trim();
+
         // load timesheets with AJAX
-        api_url = window.origin + "/api/v1/timesheets";
+        api_url = window.origin + "/api/v1/timesheets/" + username;
 
         var myArray = ['bg-primary', 'bg-secondary', 'bg-success','bg-danger','bg-warning','bg-info','bg-dark'];
 

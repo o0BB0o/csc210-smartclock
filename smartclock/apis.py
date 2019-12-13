@@ -210,3 +210,26 @@ def clock_user(username):
             db.session.add(new_stamp)
             db.session.commit()
             return timesheet_schema.jsonify(new_stamp)
+
+@app.route('/api/v1/clock_status/<username>', methods=['GET'])
+def get_clock_bool(username):
+
+    user = User.query.filter_by(username=username).first()
+
+    if not user:
+        return jsonify({'error': 'was not found'})
+    if not user.is_approved and user.is_admin:
+        return jsonify({'error': 'method impossible'})
+
+    if len(user.timesheets) == 0:
+        return jsonify({'clock_status': False})
+
+    last_stamp = Timesheet.query.filter(Timesheet.user_id == user.id).order_by(desc(Timesheet.date)).limit(1).first()
+
+    if last_stamp.is_clocked_in is True:
+        return jsonify({'clock_status': True})
+    else:
+        return jsonify({'clock_status': False})
+
+
+

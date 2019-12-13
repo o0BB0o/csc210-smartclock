@@ -2,8 +2,9 @@ btnStartShift = $("#offline");
 btnEndShift =  $("#online");
 get_username = $("#username").text();
 username = get_username.trim();
+var alwaysGetsUpdated = "";
 
-function lets_count(let_it_be_time, stop) {
+function lets_count(let_it_be_time) {
 
     var defaults = {},
         one_second = 1000,
@@ -28,7 +29,15 @@ function lets_count(let_it_be_time, stop) {
     tick();
 
     function tick() {
-        var cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame;
+
+        var cancelAnimationFrame = window.cancelAnimationFrame ||
+                window.webkitCancelAnimationFrame ||
+                window.mozCancelAnimationFrame ||
+                window.oCancelAnimationFrame ||
+                window.msCancelAnimationFrame || function (callback) {
+                    window.clearTimeout(callback);
+                };
+
         var myReq;
 
         var now = new Date(),
@@ -44,12 +53,9 @@ function lets_count(let_it_be_time, stop) {
         parts[2] = (parts[2].length == 1) ? '0' + parts[2] : parts[2];
 
         face.innerText = parts.join(':');
+        alwaysGetsUpdated = face.innerText;
 
         myReq = requestAnimationFrame(tick);
-
-        if(stop === true){
-            cancelAnimationFrame(myReq);
-        }
     }
 }
 
@@ -70,7 +76,7 @@ $.getJSON(api_url, function (response) {
     if (status.clock_status === true) {
         btnStartShift.hide();
         btnEndShift.show();
-        lets_count(let_it_be_time = new Date(status.last_time), stop = false);
+        lets_count(let_it_be_time = new Date(status.last_time));
     } else {
         btnStartShift.show();
         btnEndShift.hide();
@@ -92,20 +98,75 @@ $('.switch').on('click', function () {
             if (data.is_clocked_in === true) {
                 btnStartShift.hide();
                 btnEndShift.show();
-                lets_count(let_it_be_time = new Date(), stop=false);
+                lets_count(let_it_be_time = new Date());
                 message_time = "started at "+moment(data.clock_in_time).format('MMMM Do YYYY, h:mm:ss a');
                 alert(message_time);
+                $("#time").removeClass('bg-danger p-1 text-dark');
             } else {
                 btnStartShift.show();
                 btnEndShift.hide();
-                lets_count(let_it_be_time = new Date(), stop=true);
+                lets_count(let_it_be_time = new Date());
                 start_time = "started at "+moment(data.clock_in_time).format('MMMM Do YYYY, h:mm:ss a')+"\n";
                 end_time = "ended at "+moment(data.clock_out_time).format('MMMM Do YYYY, h:mm:ss a');
                 message_time = start_time + end_time;
                 alert(message_time);
+
+                var text = $("#time").text();
+                var divClone = $("#time").clone();
+                $("#time").replaceWith(divClone);
+                get_time = getStamp(start=data.clock_in_time, end=data.clock_out_time);
+                console.log(get_time);
+                $("#time").text(get_time);
+                $("#time").addClass('bg-danger p-1 text-dark');
             }
         })
     } else {
 			alert('Alright!');
 		}
 })
+
+
+function getStamp(start, end) {
+    function paddy(num) {
+        // adds leading zeros
+        var pad_char = '0';
+        var padlen = 2;
+        var pad = new Array(1 + padlen).join(pad_char);
+        return (pad + num).slice(-pad.length);
+    }
+
+    // start time and end time
+    var t = "";
+
+    var start = moment(start);
+    var end = moment(end);
+
+    // calculate total duration
+    var duration = moment.duration(end.diff(start));
+
+    // duration in hours
+    var hours = parseInt(duration.asHours());
+
+    if (hours !== 0) {
+        t = t + String(paddy(hours)) + ':';
+    } else {
+        t = t + '00' + ':';
+    }
+
+    // duration in minutes
+    var minutes = parseInt(duration.asMinutes())%60;
+    if (minutes !== 0) {
+        t = t + String(paddy(minutes)) + ':';
+    } else {
+        t = t + '00' + ':';
+    }
+
+    // duration in seconds
+    var seconds = parseInt(duration.asSeconds())%60;
+    if (seconds !== 0) {
+        t = t + String(paddy(seconds));
+    } else {
+        t = t + '00';
+    }
+    return t
+}

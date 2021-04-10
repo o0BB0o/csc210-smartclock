@@ -1,1 +1,1 @@
-# csc210-smartclock
+# Smartclock
